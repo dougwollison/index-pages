@@ -15,7 +15,7 @@ Coming soon.
 
 == Installation ==
 
-1. Upload the contents of `indexpages.tar.gz` to your `/wp-content/plugins/` directory
+1. Upload the contents of `index-pages.tar.gz` to your `/wp-content/plugins/` directory
 2. Activate the plugin through the 'Plugins' menu in WordPress
 
 == Usage Documentation ==
@@ -24,7 +24,7 @@ Coming soon.
 
 == Changelog ==
 
-**Details on each release can be found [on the GitHub releases page](https://github.com/dougwollison/indexpages/releases) for this project.**
+**Details on each release can be found [on the GitHub releases page](https://github.com/dougwollison/index-pages/releases) for this project.**
 
 = 1.0 =
 Initial public release.
