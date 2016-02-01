@@ -123,12 +123,11 @@ class Registry {
 	 *
 	 * @since 1.0.0
 	 *
-	 * @param string|array $post_types     A post type or array of post types to add.
-	 * @param string       $post_types,... Additional post types to add.
+	 * @param string|array $post_types A post type or array of post types to add.
 	 */
 	public static function add_post_types( $post_types ) {
 		if ( ! is_array( $post_types ) ) {
-			$post_types = func_get_args();
+			$post_types = array( $post_types );
 		}
 
 		foreach ( $post_types as $post_type ) {
@@ -141,12 +140,11 @@ class Registry {
 	 *
 	 * @since 1.0.0
 	 *
-	 * @param string|array $post_types     A post type or array of post types to remove.
-	 * @param string       $post_types,... Additional post types to remove.
+	 * @param string|array $post_types A post type or array of post types to remove.
 	 */
 	public static function remove_post_types( $post_types ) {
 		if ( ! is_array( $post_types ) ) {
-			$post_types = func_get_args();
+			$post_types = array( $post_types );
 		}
 
 		$remaining_post_types = array();
