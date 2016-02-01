@@ -38,7 +38,8 @@ define( 'INDEXPAGES_PLUGIN_DIR', __DIR__ );
 // =========================
 
 require( INDEXPAGES_PLUGIN_DIR . '/inc/autoloader.php' );
-require( INDEXPAGES_PLUGIN_DIR . '/inc/functions-indexpages.php' );
+require( INDEXPAGES_PLUGIN_DIR . '/inc/functions-internal.php' );
+require( INDEXPAGES_PLUGIN_DIR . '/inc/functions-template.php' );
 
 // =========================
 // ! Setup
