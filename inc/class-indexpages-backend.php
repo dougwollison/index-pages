@@ -119,13 +119,7 @@ class Backend extends Handler {
 	 * @since 1.0.0
 	 */
 	public static function register_settings() {
-		// Add the settings section
-		add_settings_section(
-			'index_pages',
-			__( 'Index Pages', 'index-pages' ),
-			array( static::$name, 'do_settings_section' ),
-			'reading'
-		);
+		$registered = 0;
 
 		foreach ( Registry::get_post_types() as $post_type ) {
 			// Skip if post type does not exist or does not support archives
@@ -147,6 +141,18 @@ class Backend extends Handler {
 					'label_for' => $option_name,
 					'post_type' => $post_type,
 				)
+			);
+
+			$registered++;
+		}
+
+		// If any settings were registered, add the settings output
+		if ( $registered > 0 ) {
+			add_settings_section(
+				'index_pages',
+				__( 'Index Pages', 'index-pages' ),
+				array( static::$name, 'do_settings_section' ),
+				'reading'
 			);
 		}
 	}
