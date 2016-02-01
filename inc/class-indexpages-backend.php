@@ -115,7 +115,7 @@ class Backend extends Handler {
 				$post_type_obj = get_post_type_object( $post_type );
 
 				// Default label
-				$label = sprintf( __( '%s Page', 'page for post type', 'index-pages' ), $post_type->label );
+				$label = sprintf( __( '%s Page', 'page for post type', 'index-pages' ), $post_type_obj->label );
 
 				// Use defined label if present in post type's label list
 				if ( property_exists( $post_type_obj->labels, 'index_page' ) ) {
