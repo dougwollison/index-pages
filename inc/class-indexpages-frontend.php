@@ -196,7 +196,7 @@ class Frontend extends Handler {
 		$post_type_object = get_post_type_object( 'page' );
 
 		// If an index is found, is editable, and has an edit link, add the edit button.
-		if ( ( $index_page = Registry::get_index_page() )
+		if ( ( $index_page = Registry::get_index_page( get_query_var( 'post_type' ) ) )
 		&& current_user_can( 'edit_post', $index_page )
 		&& $edit_post_link = get_edit_post_link( $index_page ) ) {
 			$wp_admin_bar->add_menu( array(
