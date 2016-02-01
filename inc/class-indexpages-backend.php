@@ -108,7 +108,23 @@ class Backend extends Handler {
 	 * @return array The filtered post states list.
 	 */
 	public static function add_index_state( array $post_states, \WP_Post $post ) {
-		// to be written
+		// Only proceed if the post is a page
+		if ( $post->post_type == 'page' ) {
+			// Check if it's an assigned index page, get the associated post type
+			if ( $post_type = Registry::is_index_page( $post->ID ) ) {
+				$post_type_obj = get_post_type_object( $post_type );
+
+				// Default label
+				$label = sprintf( __( '%s Page', 'page for post type', 'index-pages' ), $post_type->label );
+
+				// Use defined label if present in post type's label list
+				if ( property_exists( $post_type_obj->labels, 'index_page' ) ) {
+					$label = $post_type_obj->labels->index_page;
+				}
+
+				$post_states[] = $label;
+			}
+		}
 
 		return $post_states;
 	}
