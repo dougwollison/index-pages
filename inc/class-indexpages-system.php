@@ -24,7 +24,6 @@ namespace IndexPages;
  */
 
 class System {
-
 	// =========================
 	// ! Master Setup Method
 	// =========================
@@ -36,7 +35,7 @@ class System {
 	 */
 	public static function setup() {
 		// Register the uninstall hook
-		register_uninstall_hook( INDEXPAGES_PLUGIN_FILE, array( static::$name, 'uninstall' ) );
+		register_uninstall_hook( INDEXPAGES_PLUGIN_FILE, array( get_called_class(), 'uninstall' ) );
 
 		// Setup the registry
 		Registry::load();
