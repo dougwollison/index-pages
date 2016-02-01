@@ -52,7 +52,7 @@ class Frontend extends Handler {
 	 */
 	public static function register_hooks() {
 		// Don't do anything if not in the backend
-		if ( ! is_backend() ) {
+		if ( is_backend() ) {
 			return;
 		}
 
@@ -81,7 +81,45 @@ class Frontend extends Handler {
 	 * @param WP $wp The WP request object.
 	 */
 	public static function handle_request( \WP $wp ) {
-		// to be written
+		$qv =& $wp->query_vars;
+
+		// Abort if a pagename wasn't matched at all
+		if ( ! isset( $qv['pagename'] ) ) {
+			return;
+		}
+
+		// Build a RegExp to capture a page with date/paged arguments
+		$pattern =
+			'(.+?)'. // page name/path
+			'(?:/([0-9]{4})'. // optional year...
+				'(?:/([0-9]{2})'. // ...with optional month...
+					'(?:/([0-9]{2}))?'. // ...and optional day
+				')?'.
+			')?'.
+			'(?:/page/([0-9]+))?'. // and optional page number
+		'/?$';
+
+		// Proceed if the pattern checks out
+		if ( preg_match( "#$pattern#", $wp->request, $matches ) ) {
+			// Get the page using match 1 (pagename)
+			$page = get_page_by_path( $matches[1] );
+
+			// Abort if no page is found
+			if ( is_null( $page ) ) {
+				return;
+			}
+
+			if ( $post_type = Registry::is_index_page( $page->ID ) ) {
+				// Modify the request into a post type archive instead
+				$qv['post_type'] = $post_type;
+				list( , , $qv['year'], $qv['monthnum'], $qv['day'], $qv['paged'] ) = array_pad( $matches, 6, null );
+
+				// Make sure these are unset
+				unset( $qv['pagename'] );
+				unset( $qv['page'] );
+				unset( $qv['name'] );
+			}
+		}
 	}
 
 	// =========================
