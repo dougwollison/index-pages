@@ -159,6 +159,37 @@ class Registry {
 		static::$post_types = $remaining_post_types;
 	}
 
+	/**
+	 * Get the assigned index page for a post type.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param string $post_type The post type to look for.
+	 *
+	 * @return int|bool The index page ID, or false if not found.
+	 */
+	public static function get_index_page( $post_type ) {
+		if ( isset( static::$index_pages[ $post_type ] ) ) {
+			return static::$index_pages[ $post_type ];
+		}
+		return false;
+	}
+
+	/**
+	 * Get the post type for an assigned index page.
+	 *
+	 * Can also be used to check if a page is an index page.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param int $page_id The ID of the page to check.
+	 *
+	 * @return string|bool The post type it is for, or false if not found.
+	 */
+	public static function is_index_page( $page_id ) {
+		return array_search( intval( $page_id ), static::$index_pages, true );
+	}
+
 	// =========================
 	// ! Setup Method
 	// =========================
@@ -190,7 +221,7 @@ class Registry {
 		// Get all page_for_*_posts options found.
 		$pages = $wpdb->get_results( "SELECT SUBSTRING(option_name, 10, CHAR_LENGTH(option_name) - 15) AS post_type, option_value AS page_id FROM $wpdb->options WHERE option_name LIKE 'page\_for\_%\_posts'" );
 		foreach ( $pages as $page ) {
-			static::$index_pages[ $page->post_type ] = $page->page_id;
+			static::$index_pages[ $page->post_type ] = intval( $page->page_id );
 		}
 
 		// Flag that we've loaded everything
