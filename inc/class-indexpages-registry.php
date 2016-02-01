@@ -101,7 +101,7 @@ class Registry {
 	/**
 	 * Get the list of supported post types.
 	 *
-	 * If none are registered, will default to all public custom post types.
+	 * If none are registered, will default to all custom post types that support archives.
 	 *
 	 * @since 1.0.0
 	 *
@@ -110,7 +110,7 @@ class Registry {
 	public static function get_post_types() {
 		if ( empty( static::$post_types ) ) {
 			return get_post_types( array(
-				'publicly_queryable' => true,
+				'has_archive' => true,
 				'_builtin' => false,
 			) );
 		}
