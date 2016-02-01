@@ -64,6 +64,7 @@ class Backend extends Handler {
 
 		// Interface additions
 		static::add_filter( 'display_post_states', 'add_index_state', 10, 2 );
+		static::add_action( 'edit_form_after_title', 'add_index_notice', 10, 1 );
 	}
 
 	// =========================
@@ -214,6 +215,29 @@ class Backend extends Handler {
 		}
 
 		return $post_states;
+	}
+
+	/**
+	 * Print a notice about the current page being an index page.
+	 *
+	 * Unlike WordPress for the Posts page, it will not disabled the editor.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param WP_Post $post The post in question.
+	 */
+	function add_index_notice( \WP_Post $post ) {
+		// Abort if not a page or not an index page
+		if ( $post->post_type != 'page' || ! ( $post_type = Registry::is_index_page( $post->ID ) ) ) {
+			return;
+		}
+
+		// Get the plural labe to use
+		$label = strtolower( get_post_type_object( $post_type )->label );
+		echo '<div class="notice notice-warning inline"><p>' .
+			sprintf( __( 'You are currently editing the page that shows your latest %s.', 'index-pages' ), $label ) .
+			' <em>' . __( 'Your current theme may not display the content you write here.', 'index-pages' ) . '</em>' .
+		'</p></div>';
 	}
 }
 
