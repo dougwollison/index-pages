@@ -98,7 +98,18 @@ class Frontend extends Handler {
 	 * @return array The filtered title parts.
 	 */
 	public static function rewrite_title_parts( array $title_parts ) {
-		// to be written
+		// Skip if not an archive
+		if ( ! is_post_type_archive() ) {
+			return $title_parts;
+		}
+
+		// Get the queried post type
+		$post_type = get_query_var( 'post_type' );
+
+		// Get the index for this post type, update the title if found
+		if ( $index_page = Registry::get_index_page( $post_type ) ) {
+			$title_parts[0] = get_the_title( $index_page );
+		}
 
 		return $title_parts;
 	}
@@ -114,7 +125,9 @@ class Frontend extends Handler {
 	 * @return string The filtered archive link.
 	 */
 	public static function rewrite_archive_link( $link, $post_type ) {
-		// to be written
+		if ( $index = Registry::get_index_page( $post_type ) ) {
+			$link = get_permalink( $index );
+		}
 
 		return $link;
 	}
@@ -131,7 +144,29 @@ class Frontend extends Handler {
 	 * @param WP_Admin_Bar $wp_admin_bar The admin bar object.
 	 */
 	public static function add_edit_button( \WP_Admin_Bar $wp_admin_bar ) {
-		// to be written
+		// Abort if not an archive for the supported post types
+		if ( ! is_post_type_archive() ) {
+			return;
+		}
+
+		// Abort if an edit node already exists
+		if ( $wp_admin_bar->get_node( 'edit' ) ) {
+			return;
+		}
+
+		// Get the page post type object
+		$post_type_object = get_post_type_object( 'page' );
+
+		// If an index is found, is editable, and has an edit link, add the edit button.
+		if ( ( $index_page = Registry::get_index_page() )
+		&& current_user_can( 'edit_post', $index_page )
+		&& $edit_post_link = get_edit_post_link( $index_page ) ) {
+			$wp_admin_bar->add_menu( array(
+				'id' => 'edit',
+				'title' => $post_type_object->labels->edit_item,
+				'href' => $edit_post_link
+			) );
+		}
 	}
 }
 
