@@ -99,6 +99,26 @@ class Registry {
 	}
 
 	/**
+	 * Get the list of supported post types.
+	 *
+	 * If none are registered, will default to all public custom post types.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @return array The supported post types.
+	 */
+	public static function get_post_types() {
+		if ( empty( static::$post_types ) ) {
+			return get_post_types( array(
+				'publicly_queryable' => true,
+				'_builtin' => false,
+			) );
+		}
+
+		return static::$post_types;
+	}
+
+	/**
 	 * Add post types to the support list.
 	 *
 	 * @since 1.0.0
