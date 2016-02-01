@@ -7,7 +7,7 @@ Stable tag: 1.0.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
-Assign pages as the index page for WordPress custom post types, similar to the Page for Posts.
+Assign pages as the index page for WordPress custom post types, similar to the Posts Page.
 
 == Description ==
 
