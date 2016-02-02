@@ -60,20 +60,10 @@ function get_index_page( $post_type = null, $return = 'id' ) {
 		}
 
 		// Get the index page for this post type
-		$index = Registry::get_index_page( $post_type );
-
-		/**
-		 * Filter the ID of the index page retrieved.
-		 *
-		 * @since 1.8.0
-		 *
-		 * @param int    $page_id   The ID of the page determined.
-		 * @param string $post_type The post type it's meant for.
-		 */
-		$index = apply_filters( 'indexpages_get_index_page', $index, $post_type );
+		$page_id = Registry::get_index_page( $post_type );
 
 		// Return the desired value
-		return $return == 'id' ? $index : get_post( $index );
+		return $return == 'id' ? $page_id : get_post( $page_id );
 	}
 }
 
@@ -123,15 +113,6 @@ function is_index_page( $post_id = null, $match_post_type = null ) {
 	if ( $post_type != 'page' ) {
 		return false;
 	}
-
-	/**
-	 * Filter the ID of the index page to check.
-	 *
-	 * @since 1.9.1
-	 *
-	 * @param int $post_id The ID of the page determined.
-	 */
-	$post_id = apply_filters( 'indexpages_is_index_page', $post_id );
 
 	// Pass the ID to Registry::is_index_page() to get the post type
 	$post_type = Registry::is_index_page( $post_id );

@@ -167,10 +167,22 @@ class Registry {
 	 * @return int|bool The index page ID, or false if not found.
 	 */
 	public static function get_index_page( $post_type ) {
+		$page_id = false;
 		if ( isset( static::$index_pages[ $post_type ] ) ) {
-			return static::$index_pages[ $post_type ];
+			$page_id = static::$index_pages[ $post_type ];
 		}
-		return false;
+
+		/**
+		 * Filter the ID of the index page retrieved.
+		 *
+		 * @since 1.8.0
+		 *
+		 * @param int    $page_id   The ID of the page determined.
+		 * @param string $post_type The post type it's meant for.
+		 */
+		$page_id = apply_filters( 'indexpages_get_index_page', $page_id, $post_type );
+
+		return $page_id;
 	}
 
 	/**
@@ -185,6 +197,15 @@ class Registry {
 	 * @return string|bool The post type it is for, or false if not found.
 	 */
 	public static function is_index_page( $page_id ) {
+		/**
+		 * Filter the ID of the index page to check.
+		 *
+		 * @since 1.9.1
+		 *
+		 * @param int $post_id The ID of the page determined.
+		 */
+		$page_id = apply_filters( 'indexpages_is_index_page', $page_id );
+
 		return array_search( intval( $page_id ), static::$index_pages, true );
 	}
 
