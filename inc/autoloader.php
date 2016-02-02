@@ -1,15 +1,15 @@
 <?php
 /**
- * POMOEdit Autoloading System
+ * IndexPages Autoloading System
  *
- * @package POMOEdit
+ * @package IndexPages
  *
  * @internal
  *
  * @since 1.0.0
  */
 
-namespace POMOEdit_Autoloader;
+namespace IndexPages_Autoloader;
 
 /**
  * Handle file locating and loading.
