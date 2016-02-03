@@ -38,6 +38,17 @@ For theme and plugin developers, you can register support for your custom post t
 IndexPages\Registry::add_post_type( $post_types ); // a single post type or array of post types
 `
 
+When an index page is assigned, it's permalink will point to the associated post type's archive, with
+the page title updated appropriately.
+
+For theme and plugin developers, you can access the index page's post object with the following.
+
+`
+the_index_page();
+`
+
+This works exactly like `the_post();`, populating the `$post` variable with the index page's data.
+
 == Changelog ==
 
 **Details on each release can be found [on the GitHub releases page](https://github.com/dougwollison/index-pages/releases) for this project.**
