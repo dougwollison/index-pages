@@ -195,6 +195,7 @@ class Backend extends Handler {
 	/**
 	 * Filter the post states list, adding a "*s Page" state flag to if applicable.
 	 *
+	 * @since 1.0.1 Store the post state in an explicit key.
 	 * @since 1.0.0
 	 *
 	 * @param array   $post_states The list of post states for the post.
