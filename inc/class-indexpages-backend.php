@@ -210,7 +210,7 @@ class Backend extends Handler {
 				// Get the label to use
 				$label = static::get_index_page_label( $post_type );
 
-				$post_states[] = $label;
+				$post_states[ "page_for_{$post_type}_posts" ] = $label;
 			}
 		}
 
