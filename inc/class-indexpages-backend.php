@@ -47,8 +47,6 @@ class Backend extends Handler {
 	 * Register hooks.
 	 *
 	 * @since 1.0.0
-	 *
-	 * @uses Registry::get() to retrieve enabled post types.
 	 */
 	public static function register_hooks() {
 		// Don't do anything if not in the backend
