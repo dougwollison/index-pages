@@ -48,6 +48,35 @@ final class Backend extends Handler {
 	}
 
 	// =========================
+	// ! Utilities
+	// =========================
+
+	/**
+	 * Get the "*s Page" label for a post type.
+	 *
+	 * Will use the defined label if found, otherwise use template string.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param string $post_type The post type to get the label for.
+	 *
+	 * @return string The label to use.
+	 */
+	protected static function get_index_page_label( $post_type ) {
+		$post_type_obj = get_post_type_object( $post_type );
+
+		// Default label
+		$label = sprintf( __( '%s Page', 'index-pages' ), $post_type_obj->label );
+
+		// Use defined label if present in post type's label list
+		if ( property_exists( $post_type_obj->labels, 'index_page' ) ) {
+			$label = $post_type_obj->labels->index_page;
+		}
+
+		return $label;
+	}
+
+	// =========================
 	// ! Setup Stuff
 	// =========================
 
@@ -118,7 +147,7 @@ final class Backend extends Handler {
 			add_settings_field(
 				$option_name,
 				static::get_index_page_label( $post_type ),
-				array( static::$name, 'do_settings_field' ),
+				array( __CLASS__, 'do_settings_field' ),
 				'reading',
 				'index_pages',
 				array(
@@ -135,7 +164,7 @@ final class Backend extends Handler {
 			add_settings_section(
 				'index_pages',
 				__( 'Index Pages', 'index-pages' ),
-				array( static::$name, 'do_settings_section' ),
+				array( __CLASS__, 'do_settings_section' ),
 				'reading'
 			);
 		}
