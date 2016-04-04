@@ -3,7 +3,7 @@ Contributors: dougwollison
 Tags: index page, custom post type, custom index, page for posts
 Requires at least: 4.0.0
 Tested up to: 4.4.1
-Stable tag: 1.0.0
+Stable tag: 1.1.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -53,5 +53,8 @@ This works exactly like `the_post();`, populating the `$post` variable with the 
 
 **Details on each release can be found [on the GitHub releases page](https://github.com/dougwollison/index-pages/releases) for this project.**
 
-= 1.0 =
+= 1.1.0 =
+Updated file and code structure, added missing static keyword to Backend::add_index_notice().
+
+= 1.0.0 =
 Initial public release.
