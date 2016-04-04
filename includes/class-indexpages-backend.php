@@ -37,7 +37,7 @@ final class Backend extends Handler {
 		}
 
 		// After-setup stuff
-		static::add_action( 'plugins_loaded', 'ready' );
+		static::add_action( 'plugins_loaded', 'load_textdomain' );
 
 		// Settings registration
 		static::add_action( 'admin_init', 'register_settings', 10, 0 );
