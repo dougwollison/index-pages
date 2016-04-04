@@ -17,15 +17,11 @@ namespace IndexPages;
  * implementation of the assigned index pages, including
  * title rewriting, archive permalinks, and admin bar tweaks.
  *
- * @package IndexPages
- * @subpackage Handlers
- *
  * @internal Used by the System.
  *
  * @since 1.0.0
  */
-
-class Frontend extends Handler {
+final class Frontend extends Handler {
 	// =========================
 	// ! Properties
 	// =========================

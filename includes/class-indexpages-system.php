@@ -15,15 +15,11 @@ namespace IndexPages;
  *
  * Sets up the Registry and all the Handler classes.
  *
- * @package IndexPages
- * @subpackage Helpers
- *
  * @api
  *
  * @since 1.0.0
  */
-
-class System {
+final class System {
 	// =========================
 	// ! Master Setup Method
 	// =========================
@@ -42,4 +38,3 @@ class System {
 		Backend::register_hooks();
 	}
 }
-

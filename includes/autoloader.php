@@ -43,7 +43,7 @@ function find( $type, $name ) {
 }
 
 /**
- * Find/load an POMOEdit class.
+ * Find/load an IndexPages class.
  *
  * Will automatically initailize if it's a Functional sub-class.
  *
@@ -56,17 +56,11 @@ function find( $type, $name ) {
  * @param string $class The name of the class being requested.
  */
 function find_class( $class ) {
-	// Make sure the file exists before loading it
-	if ( find( 'class', $class ) ){
-		// Initialize it if it's a Handler-based class
-		if ( is_subclass_of( $class, 'IndexPages\\Handler' ) ) {
-			call_user_func( array( $class, 'init' ) );
-		}
-	}
+	find( 'class', $class );
 }
 
 /**
- * Find/load an POMOEdit abstract class.
+ * Find/load an IndexPages abstract class.
  *
  * @internal
  *
@@ -80,22 +74,6 @@ function find_abstract( $class ) {
 	find( 'abstract', $class );
 }
 
-/**
- * Find/load an POMOEdit trait.
- *
- * @internal
- *
- * @since 1.0.0
- *
- * @uses find() to find and load the trait if it exists.
- *
- * @param string $trait The name of the trait being requested.
- */
-function find_trait( $trait ) {
-	find( 'trait', $trait );
-}
-
 // Register the find
 spl_autoload_register( __NAMESPACE__ . '\\find_class' );
 spl_autoload_register( __NAMESPACE__ . '\\find_abstract' );
-spl_autoload_register( __NAMESPACE__ . '\\find_trait' );

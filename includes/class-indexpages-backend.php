@@ -13,32 +13,14 @@ namespace IndexPages;
 /**
  * The Backend Functionality
  *
- * Hooks into various backend systems to identify
- * assigned index pages, add settings fields, and
- * load the text domain.
- *
- * @package IndexPages
- * @subpackage Handlers
+ * Hooks into various backend systems to load
+ * custom assets and add the editor interface.
  *
  * @internal Used by the System.
  *
  * @since 1.0.0
  */
-
-class Backend extends Handler {
-	// =========================
-	// ! Properties
-	// =========================
-
-	/**
-	 * The name of the class.
-	 *
-	 * @since 1.0.0
-	 *
-	 * @var string
-	 */
-	protected static $name;
-
+final class Backend extends Handler {
 	// =========================
 	// ! Hook Registration
 	// =========================
@@ -66,36 +48,7 @@ class Backend extends Handler {
 	}
 
 	// =========================
-	// ! Utilities
-	// =========================
-
-	/**
-	 * Get the "*s Page" label for a post type.
-	 *
-	 * Will use the defined label if found, otherwise use template string.
-	 *
-	 * @since 1.0.0
-	 *
-	 * @param string $post_type The post type to get the label for.
-	 *
-	 * @return string The label to use.
-	 */
-	protected static function get_index_page_label( $post_type ) {
-		$post_type_obj = get_post_type_object( $post_type );
-
-		// Default label
-		$label = sprintf( __( '%s Page', 'index-pages' ), $post_type_obj->label );
-
-		// Use defined label if present in post type's label list
-		if ( property_exists( $post_type_obj->labels, 'index_page' ) ) {
-			$label = $post_type_obj->labels->index_page;
-		}
-
-		return $label;
-	}
-
-	// =========================
-	// ! After Setup
+	// ! Setup Stuff
 	// =========================
 
 	/**
@@ -103,9 +56,41 @@ class Backend extends Handler {
 	 *
 	 * @since 1.0.0
 	 */
-	public static function ready() {
+	public static function load_textdomain() {
 		// Load the textdomain
-		load_plugin_textdomain( 'index-pages', false, INDEXPAGES_PLUGIN_DIR . '/lang' );
+		load_plugin_textdomain( 'indexpages', false, dirname( INDEXPAGES_PLUGIN_FILE ) . '/languages' );
+	}
+
+	// =========================
+	// ! Plugin Information
+	// =========================
+
+	/**
+	 * In case of update, check for notice about the update.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param array $plugin The information about the plugin and the update.
+	 */
+	public static function update_notice( $plugin ) {
+		// Get the version number that the update is for
+		$version = $plugin['new_version'];
+
+		// Check if there's a notice about the update
+		$transient = "indexpages-update-notice-{$version}";
+		$notice = get_transient( $transient );
+		if ( $notice === false ) {
+			// Hasn't been saved, fetch it from the SVN repo
+			$notice = file_get_contents( "http://plugins.svn.wordpress.org/index-pages/assets/notice-{$version}.txt" ) ?: '';
+
+			// Save the notice
+			set_transient( $transient, $notice, YEAR_IN_SECONDS );
+		}
+
+		// Print out the notice if there is one
+		if ( $notice ) {
+			echo apply_filters( 'the_content', $notice );
+		}
 	}
 
 	// =========================
@@ -221,11 +206,12 @@ class Backend extends Handler {
 	 *
 	 * Unlike WordPress for the Posts page, it will not disabled the editor.
 	 *
+	 * @since 1.1.0 Added missing static keyword
 	 * @since 1.0.0
 	 *
 	 * @param WP_Post $post The post in question.
 	 */
-	function add_index_notice( \WP_Post $post ) {
+	public static function add_index_notice( \WP_Post $post ) {
 		// Abort if not a page or not an index page
 		if ( $post->post_type != 'page' || ! ( $post_type = Registry::is_index_page( $post->ID ) ) ) {
 			return;
@@ -239,4 +225,3 @@ class Backend extends Handler {
 		'</p></div>';
 	}
 }
-

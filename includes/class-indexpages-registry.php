@@ -1,9 +1,9 @@
 <?php
 /**
- * IndexPages Options Registry
+ * IndexPages Registry API
  *
  * @package IndexPages
- * @subpackage Helpers
+ * @subpackage Tools
  *
  * @since 1.0.0
  */
@@ -11,19 +11,15 @@
 namespace IndexPages;
 
 /**
- * The Options Registry
+ * The Registry
  *
  * Stores all the configuration options for the system.
- *
- * @package IndexPages
- * @subpackage Helpers
  *
  * @api
  *
  * @since 1.0.0
  */
-
-class Registry {
+final class Registry {
 	// =========================
 	// ! Properties
 	// =========================
