@@ -35,7 +35,7 @@ registered with the `has_archive` argument set to true will be available for ass
 For theme and plugin developers, you can register support for your custom post types like so:
 
 `
-IndexPages\Registry::add_post_type( $post_types ); // a single post type or array of post types
+IndexPages\Registry::add_post_types( $post_types ); // a single post type or array of post types
 `
 
 When an index page is assigned, it's permalink will point to the associated post type's archive, with
