@@ -72,6 +72,7 @@ final class Frontend extends Handler {
 	 *
 	 * Also checks for date and pagination parameters.
 	 *
+	 * @since 1.2.0 Added check to make sure post type currently exists.
 	 * @since 1.0.0
 	 *
 	 * @param WP $wp The WP request object.
@@ -105,7 +106,8 @@ final class Frontend extends Handler {
 				return;
 			}
 
-			if ( $post_type = Registry::is_index_page( $page->ID ) ) {
+			// Get the post type, and validate that it exists
+			if ( ( $post_type = Registry::is_index_page( $page->ID ) ) && post_type_exists( $post_type ) ) {
 				// Modify the request into a post type archive instead
 				$qv['post_type'] = $post_type;
 				list( , , $qv['year'], $qv['monthnum'], $qv['day'], $qv['paged'] ) = array_pad( $matches, 6, null );

@@ -207,7 +207,8 @@ final class Backend extends Handler {
 	/**
 	 * Filter the post states list, adding a "*s Page" state flag to if applicable.
 	 *
-	 * @since 1.0.1 Store the post state in an explicit key.
+	 * @since 1.2.0 Added check to make sure post type currently exists.
+	 * @since 1.1.0 Store the post state in an explicit key.
 	 * @since 1.0.0
 	 *
 	 * @param array   $post_states The list of post states for the post.
@@ -218,8 +219,9 @@ final class Backend extends Handler {
 	public static function add_index_state( array $post_states, \WP_Post $post ) {
 		// Only proceed if the post is a page
 		if ( $post->post_type == 'page' ) {
-			// Check if it's an assigned index page, get the associated post type
-			if ( $post_type = Registry::is_index_page( $post->ID ) ) {
+			// Check if it's an assigned index page,
+			// get the associated post type (and ensure it exists)
+			if ( ( $post_type = Registry::is_index_page( $post->ID ) ) && post_type_exists( $post_type ) ) {
 				// Get the label to use
 				$label = static::get_index_page_label( $post_type );
 
