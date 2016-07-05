@@ -244,7 +244,7 @@ final class Backend extends Handler {
 	 */
 	public static function add_index_notice( \WP_Post $post ) {
 		// Abort if not a page or not an index page
-		if ( $post->post_type != 'page' || ! ( $post_type = Registry::is_index_page( $post->ID ) ) ) {
+		if ( $post->post_type != 'page' || ( ( $post_type = Registry::is_index_page( $post->ID ) ) && ! post_type_exists( $post_type ) ) ) {
 			return;
 		}
 
