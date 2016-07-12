@@ -237,6 +237,7 @@ final class Backend extends Handler {
 	 *
 	 * Unlike WordPress for the Posts page, it will not disabled the editor.
 	 *
+	 * @since 1.2.1 Rejigged check to handle deprecated index pages.
 	 * @since 1.1.0 Added missing static keyword
 	 * @since 1.0.0
 	 *
@@ -244,7 +245,7 @@ final class Backend extends Handler {
 	 */
 	public static function add_index_notice( \WP_Post $post ) {
 		// Abort if not a page or not an index page
-		if ( $post->post_type != 'page' || ( ( $post_type = Registry::is_index_page( $post->ID ) ) && ! post_type_exists( $post_type ) ) ) {
+		if ( $post->post_type != 'page' || ! ( $post_type = Registry::is_index_page( $post->ID ) ) || ! post_type_exists( $post_type ) ) {
 			return;
 		}
 
