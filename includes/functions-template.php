@@ -115,7 +115,7 @@ function is_index_page( $post_id = null, $match_post_type = null ) {
 	}
 
 	// Pass the ID to Registry::is_index_page() to get the post type
-	$post_type = Registry::is_index_page( $post_id );
+	$for_post_type = Registry::is_index_page( $post_id );
 
 	if ( is_null( $match_post_type ) ) {
 		// No match requested, return the post type
