@@ -53,14 +53,14 @@ final class Frontend extends Handler {
 		}
 
 		// Request handling
-		static::add_action( 'parse_request', 'handle_request', 10, 1 );
+		self::add_action( 'parse_request', 'handle_request', 10, 1 );
 
 		// Title/link rewriting
-		static::add_filter( 'wp_title_parts', 'rewrite_title_parts', 10, 1 );
-		static::add_filter( 'post_type_archive_link', 'rewrite_archive_link', 10, 2 );
+		self::add_filter( 'wp_title_parts', 'rewrite_title_parts', 10, 1 );
+		self::add_filter( 'post_type_archive_link', 'rewrite_archive_link', 10, 2 );
 
 		// Admin bar additions
-		static::add_action( 'admin_bar_menu', 'add_edit_button', 85, 1 );
+		self::add_action( 'admin_bar_menu', 'add_edit_button', 85, 1 );
 	}
 
 	// =========================

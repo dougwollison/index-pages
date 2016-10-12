@@ -75,7 +75,7 @@ final class Registry {
 	 */
 	public static function get( $property, $default = null ) {
 		if ( property_exists( get_called_class(), $property ) ) {
-			return static::$$property;
+			return self::$$property;
 		}
 		return $default;
 	}
@@ -90,7 +90,7 @@ final class Registry {
 	 */
 	public static function set( $property, $value = null ) {
 		if ( property_exists( get_called_class(), $property ) ) {
-			static::$$property = $value;
+			self::$$property = $value;
 		}
 	}
 
@@ -104,14 +104,14 @@ final class Registry {
 	 * @return array The supported post types.
 	 */
 	public static function get_post_types() {
-		if ( empty( static::$post_types ) ) {
+		if ( empty( self::$post_types ) ) {
 			return get_post_types( array(
 				'has_archive' => true,
 				'_builtin' => false,
 			) );
 		}
 
-		return static::$post_types;
+		return self::$post_types;
 	}
 
 	/**
@@ -127,7 +127,7 @@ final class Registry {
 		}
 
 		foreach ( $post_types as $post_type ) {
-			static::$post_types[] = $post_type;
+			self::$post_types[] = $post_type;
 		}
 	}
 
@@ -144,13 +144,13 @@ final class Registry {
 		}
 
 		$remaining_post_types = array();
-		foreach ( static::$post_types as $post_type ) {
+		foreach ( self::$post_types as $post_type ) {
 			if ( ! in_array( $post_type, $post_types ) ) {
 				$remaining_post_types[] = $post_type;
 			}
 		}
 
-		static::$post_types = $remaining_post_types;
+		self::$post_types = $remaining_post_types;
 	}
 
 	/**
@@ -164,8 +164,8 @@ final class Registry {
 	 */
 	public static function get_index_page( $post_type ) {
 		$page_id = false;
-		if ( isset( static::$index_pages[ $post_type ] ) ) {
-			$page_id = static::$index_pages[ $post_type ];
+		if ( isset( self::$index_pages[ $post_type ] ) ) {
+			$page_id = self::$index_pages[ $post_type ];
 		}
 
 		/**
@@ -202,7 +202,7 @@ final class Registry {
 		 */
 		$page_id = apply_filters( 'indexpages_is_index_page', $page_id );
 
-		return array_search( intval( $page_id ), static::$index_pages, true );
+		return array_search( intval( $page_id ), self::$index_pages, true );
 	}
 
 	// =========================
@@ -225,21 +225,21 @@ final class Registry {
 	public static function load( $reload = false ) {
 		global $wpdb;
 
-		if ( static::$__loaded && ! $reload ) {
+		if ( self::$__loaded && ! $reload ) {
 			// Already did this
 			return;
 		}
 
 		// Automatically log the index page for posts
-		static::$index_pages[ 'post' ] = get_option( 'page_for_posts' );
+		self::$index_pages[ 'post' ] = get_option( 'page_for_posts' );
 
 		// Get all page_for_*_posts options found.
 		$pages = $wpdb->get_results( "SELECT SUBSTRING(option_name, 10, CHAR_LENGTH(option_name) - 15) AS post_type, option_value AS page_id FROM $wpdb->options WHERE option_name LIKE 'page\_for\_%\_posts'" );
 		foreach ( $pages as $page ) {
-			static::$index_pages[ $page->post_type ] = intval( $page->page_id );
+			self::$index_pages[ $page->post_type ] = intval( $page->page_id );
 		}
 
 		// Flag that we've loaded everything
-		static::$__loaded = true;
+		self::$__loaded = true;
 	}
 }

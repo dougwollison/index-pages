@@ -37,14 +37,14 @@ final class Backend extends Handler {
 		}
 
 		// After-setup stuff
-		static::add_action( 'plugins_loaded', 'load_textdomain' );
+		self::add_action( 'plugins_loaded', 'load_textdomain' );
 
 		// Settings registration
-		static::add_action( 'admin_init', 'register_settings', 10, 0 );
+		self::add_action( 'admin_init', 'register_settings', 10, 0 );
 
 		// Interface additions
-		static::add_filter( 'display_post_states', 'add_index_state', 10, 2 );
-		static::add_action( 'edit_form_after_title', 'add_index_notice', 10, 1 );
+		self::add_filter( 'display_post_states', 'add_index_state', 10, 2 );
+		self::add_action( 'edit_form_after_title', 'add_index_notice', 10, 1 );
 	}
 
 	// =========================
@@ -146,7 +146,7 @@ final class Backend extends Handler {
 
 			add_settings_field(
 				$option_name,
-				static::get_index_page_label( $post_type ),
+				self::get_index_page_label( $post_type ),
 				array( __CLASS__, 'do_settings_field' ),
 				'reading',
 				'index_pages',
@@ -223,7 +223,7 @@ final class Backend extends Handler {
 			// get the associated post type (and ensure it exists)
 			if ( ( $post_type = Registry::is_index_page( $post->ID ) ) && post_type_exists( $post_type ) ) {
 				// Get the label to use
-				$label = static::get_index_page_label( $post_type );
+				$label = self::get_index_page_label( $post_type );
 
 				$post_states[ "page_for_{$post_type}_posts" ] = $label;
 			}
