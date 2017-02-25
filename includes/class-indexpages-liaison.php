@@ -31,7 +31,7 @@ final class Liaison extends Handler {
 	 */
 	public static function register_hooks() {
 		// Yoast SEO compatibility
-		self::add_hook( 'plugins_loaded', 'add_wpseo_helpers', 10, 0 );
+		self::add_action( 'plugins_loaded', 'add_wpseo_helpers', 10, 0 );
 	}
 
 	// =========================
@@ -50,7 +50,7 @@ final class Liaison extends Handler {
 		}
 
 		// Add WC endpoint support to localize_here
-		self::add_hook( 'wpseo_register_extra_replacements', 'wpseo_register_extra_replacements', 10, 0 );
+		self::add_action( 'wpseo_register_extra_replacements', 'wpseo_register_extra_replacements', 10, 0 );
 	}
 
 	/**
