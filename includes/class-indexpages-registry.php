@@ -95,6 +95,27 @@ final class Registry {
 	}
 
 	/**
+	 * Test if a post type is supported.
+	 *
+	 * Will check if it exists and has index-page support or has_archive set.
+	 *
+	 * @since 1.3.0
+	 *
+	 * @param string $post_type The post type to check.
+	 */
+	public static function is_post_type_supported( $post_type ) {
+		if ( ! post_type_exists( $post_type ) ) {
+			return false;
+		}
+
+		if ( post_type_supports( $post_type, 'index-page' ) ) {
+			return true;
+		}
+
+		return get_post_type_object( $post_type )->has_archive;
+	}
+
+	/**
 	 * Get the list of supported post types.
 	 *
 	 * If none are registered, will default to all custom post types that support archives.
