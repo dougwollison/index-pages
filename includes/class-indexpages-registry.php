@@ -36,18 +36,6 @@ final class Registry {
 	protected static $__loaded = false;
 
 	/**
-	 * A list of post types that should
-	 * have index pages assigned.
-	 *
-	 * @internal
-	 *
-	 * @since 1.0.0
-	 *
-	 * @var array
-	 */
-	protected static $post_types = array();
-
-	/**
 	 * The list of assigned index pages,
 	 * indexed by post type.
 	 *
@@ -116,62 +104,35 @@ final class Registry {
 	}
 
 	/**
-	 * Get the list of supported post types.
-	 *
-	 * If none are registered, will default to all custom post types that support archives.
-	 *
-	 * @since 1.0.0
-	 *
-	 * @return array The supported post types.
-	 */
-	public static function get_post_types() {
-		if ( empty( self::$post_types ) ) {
-			return get_post_types( array(
-				'has_archive' => true,
-				'_builtin' => false,
-			) );
-		}
-
-		return self::$post_types;
-	}
-
-	/**
 	 * Add post types to the support list.
 	 *
+	 * @since 1.3.0 Rewrote to use add_post_type_support().
 	 * @since 1.0.0
 	 *
 	 * @param string|array $post_types A post type or array of post types to add.
 	 */
 	public static function add_post_types( $post_types ) {
-		if ( ! is_array( $post_types ) ) {
-			$post_types = array( $post_types );
-		}
+		$post_types = (array) $post_types;
 
 		foreach ( $post_types as $post_type ) {
-			self::$post_types[] = $post_type;
+			add_post_type_support( $post_type, 'index-page' );
 		}
 	}
 
 	/**
 	 * Remove post types from the support list.
 	 *
+	 * @since 1.3.0 Rewrote to use remove_post_type_support().
 	 * @since 1.0.0
 	 *
 	 * @param string|array $post_types A post type or array of post types to remove.
 	 */
 	public static function remove_post_types( $post_types ) {
-		if ( ! is_array( $post_types ) ) {
-			$post_types = array( $post_types );
-		}
+		$post_types = (array) $post_types;
 
-		$remaining_post_types = array();
-		foreach ( self::$post_types as $post_type ) {
-			if ( ! in_array( $post_type, $post_types ) ) {
-				$remaining_post_types[] = $post_type;
-			}
+		foreach ( $post_types as $post_type ) {
+			remove_post_type_support( $post_type, 'index-page' );
 		}
-
-		self::$post_types = $remaining_post_types;
 	}
 
 	/**
