@@ -59,7 +59,7 @@ final class Liaison extends Handler {
 	 * @since 1.3.0
 	 */
 	public static function wpseo_register_extra_replacements() {
-		WPSEO_Replace_Vars::register_replacement( 'indexpage', array( __CLASS__, 'wpseo_do_indexpage_replacement' ), 'advanced', __( 'Replaced with the title of the applicable Index Page', 'index-pages' ) );
+		\WPSEO_Replace_Vars::register_replacement( 'indexpage', array( __CLASS__, 'wpseo_do_indexpage_replacement' ), 'advanced', __( 'Replaced with the title of the applicable Index Page', 'index-pages' ) );
 	}
 
 	/**
