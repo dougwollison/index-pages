@@ -111,7 +111,7 @@ final class Frontend extends Handler {
 			}
 
 			// Get the post type, and validate that it exists
-			if ( ( $post_type = Registry::is_index_page( $page->ID ) ) && post_type_exists( $post_type ) ) {
+			if ( $post_type = Registry::is_index_page( $page->ID ) ) {
 				// Modify the request into a post type archive instead
 				$qv['post_type'] = $post_type;
 				list( , , $qv['year'], $qv['monthnum'], $qv['day'], $qv['paged'] ) = array_pad( $matches, 6, null );
