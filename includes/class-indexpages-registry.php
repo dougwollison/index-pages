@@ -216,6 +216,7 @@ final class Registry {
 	 *
 	 * @internal
 	 *
+	 * @since 1.3.0 Convert page_for_posts to integer.
 	 * @since 1.0.0
 	 *
 	 * @see Registry::$__loaded
@@ -233,7 +234,7 @@ final class Registry {
 		}
 
 		// Automatically log the index page for posts
-		self::$index_pages[ 'post' ] = get_option( 'page_for_posts' );
+		self::$index_pages[ 'post' ] = intval( get_option( 'page_for_posts' ) );
 
 		// Get all page_for_*_posts options found.
 		$pages = $wpdb->get_results( "SELECT SUBSTRING(option_name, 10, CHAR_LENGTH(option_name) - 15) AS post_type, option_value AS page_id FROM $wpdb->options WHERE option_name LIKE 'page\_for\_%\_posts'" );
