@@ -238,6 +238,7 @@ final class Backend extends Handler {
 	 *
 	 * Unlike WordPress for the Posts page, it will not disabled the editor.
 	 *
+	 * @since 1.3.0 Modified notice to only mention lack of content display when index-pages support is absent.
 	 * @since 1.2.1 Rejigged check to handle deprecated index pages.
 	 * @since 1.1.0 Added missing static keyword
 	 * @since 1.0.0
@@ -252,9 +253,17 @@ final class Backend extends Handler {
 
 		// Get the plural labe to use
 		$label = strtolower( get_post_type_object( $post_type )->label );
-		echo '<div class="notice notice-warning inline"><p>' .
-			sprintf( __( 'You are currently editing the page that shows your latest %s.', 'index-pages' ), $label ) .
-			' <em>' . __( 'Your current theme may not display the content you write here.', 'index-pages' ) . '</em>' .
-		'</p></div>';
+
+		// Default notice type/message
+		$notice_type = 'info';
+		$notice_text = sprintf( __( 'You are currently editing the page that shows your latest %s.', 'index-pages' ), $label );
+
+		// If the post type doesn't explicitly support index-pages, mention content may not be displayed.
+		if ( ! post_type_supports( $post_type, 'index-page' ) ) {
+			$notice_type = 'warning';
+			$notice_text .= ' <em>' . __( 'Your current theme may not display the content you write here.', 'index-pages' ) . '</em>';
+		}
+
+		printf( '<div class="notice notice-%s inline"><p>%s</p></div>', $notice_type, $notice_text );
 	}
 }
