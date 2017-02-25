@@ -92,6 +92,11 @@ final class Registry {
 	 * @param string $post_type The post type to check.
 	 */
 	public static function is_post_type_supported( $post_type ) {
+		// Assume true if it's the Post post type
+		if ( $post_type == 'post' ) {
+			return true;
+		}
+
 		if ( ! post_type_exists( $post_type ) ) {
 			return false;
 		}
