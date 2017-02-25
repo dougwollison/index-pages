@@ -186,6 +186,7 @@ final class Registry {
 	 *
 	 * Can also be used to check if a page is an index page.
 	 *
+	 * @since 1.3.0 Fallback to post post_type if applicable.
 	 * @since 1.0.0
 	 *
 	 * @param int $page_id The ID of the page to check.
@@ -202,7 +203,9 @@ final class Registry {
 		 */
 		$page_id = apply_filters( 'indexpages_is_index_page', $page_id );
 
-		return array_search( intval( $page_id ), self::$index_pages, true );
+		$fallback = $page_id == get_option( 'page_for_posts' ) ? 'post' : false;
+
+		return array_search( intval( $page_id ), self::$index_pages, true ) ?: $fallback;
 	}
 
 	// =========================
