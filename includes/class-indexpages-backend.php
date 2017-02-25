@@ -137,7 +137,7 @@ final class Backend extends Handler {
 
 		foreach ( get_post_types( array( '_builtin' => false ) ) as $post_type ) {
 			// Skip if post type is not supported
-			if ( ! self::is_post_type_supported( $post_type ) ) {
+			if ( ! Registry::is_post_type_supported( $post_type ) ) {
 				continue;
 			}
 
