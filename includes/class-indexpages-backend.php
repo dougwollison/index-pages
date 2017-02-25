@@ -207,6 +207,7 @@ final class Backend extends Handler {
 	/**
 	 * Filter the post states list, adding a "*s Page" state flag to if applicable.
 	 *
+	 * @since 1.3.0 Add check to prevent duplicate printing of "Posts Page".
 	 * @since 1.2.0 Added check to make sure post type currently exists.
 	 * @since 1.1.0 Store the post state in an explicit key.
 	 * @since 1.0.0
