@@ -129,14 +129,15 @@ final class Backend extends Handler {
 	/**
 	 * Add "Page for * posts" dropdowns to the reading settings page.
 	 *
+	 * @since 1.3.0 Now loops through all custom post types and checks for support.
 	 * @since 1.0.0
 	 */
 	public static function register_settings() {
 		$registered = 0;
 
-		foreach ( Registry::get_post_types() as $post_type ) {
-			// Skip if post type does not exist or does not support archives
-			if ( ! post_type_exists( $post_type ) || ! get_post_type_object( $post_type )->has_archive ) {
+		foreach ( get_post_types( array( '_builtin' => false ) ) as $post_type ) {
+			// Skip if post type is not supported
+			if ( ! self::is_post_type_supported( $post_type ) ) {
 				continue;
 			}
 

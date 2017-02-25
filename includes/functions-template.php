@@ -57,8 +57,8 @@ function get_index_page( $post_type = null, $return = 'id' ) {
 			return get_index_page( $post_type, $return );
 		}
 	} else {
-		// Return null if it does not exist, or is not one of the supported post types (unless it's post)
-		if ( ! post_type_exists( $post_type ) || ( ! in_array( $post_type, Registry::get_post_types() ) && $post_type != 'post' ) ) {
+		// Return null if it does not exist, or is not a supported post type (unless it's post)
+		if ( ! post_type_exists( $post_type ) || ( ! Registry::is_post_type_supported( $post_type ) && $post_type != 'post' ) ) {
 			return null;
 		}
 
