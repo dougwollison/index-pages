@@ -144,7 +144,7 @@ final class Frontend extends Handler {
 		}
 
 		// Get the queried post type
-		$post_type = get_query_var( 'post_type' );
+		$post_type = get_query_var( 'post_type', 'post' );
 
 		// Get the index for this post type, update the title if found
 		if ( $index_page = Registry::get_index_page( $post_type ) ) {
