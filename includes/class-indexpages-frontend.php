@@ -42,6 +42,7 @@ final class Frontend extends Handler {
 	/**
 	 * Register hooks.
 	 *
+	 * @since 1.3.0 Added wp_nav_menu_objects hook.
 	 * @since 1.0.0
 	 *
 	 * @uses Registry::get() to retrieve enabled post types.
@@ -60,7 +61,7 @@ final class Frontend extends Handler {
 		self::add_filter( 'post_type_archive_link', 'rewrite_archive_link', 10, 2 );
 
 		// Nav menu rewriting
-		static::add_filter( 'wp_nav_menu_objects', 'handle_index_page_links', 10, 1 );
+		self::add_filter( 'wp_nav_menu_objects', 'handle_index_page_links', 10, 1 );
 
 		// Admin bar additions
 		self::add_action( 'admin_bar_menu', 'add_edit_button', 85, 1 );
@@ -178,7 +179,7 @@ final class Frontend extends Handler {
 	/**
 	 * Filter the menu items and handle current menu item/page for index pages.
 	 *
-	 * @since 1.2.0
+	 * @since 1.3.0
 	 *
 	 * @param array $menu_items The menu items to filter.
 	 *
