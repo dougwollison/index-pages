@@ -138,6 +138,7 @@ final class Registry {
 	/**
 	 * Get the assigned index page for a post type.
 	 *
+	 * @since 1.3.0 Updated to use is_post_type_supported().
 	 * @since 1.0.0
 	 *
 	 * @param string $post_type The post type to look for.
@@ -145,6 +146,11 @@ final class Registry {
 	 * @return int|bool The index page ID, or false if not found.
 	 */
 	public static function get_index_page( $post_type ) {
+		// Bail if not a supported post type
+		if ( ! self::is_post_type_supported( $post_type ) ) {
+			return false;
+		}
+
 		$page_id = false;
 		if ( isset( self::$index_pages[ $post_type ] ) ) {
 			$page_id = self::$index_pages[ $post_type ];
@@ -168,7 +174,7 @@ final class Registry {
 	 *
 	 * Can also be used to check if a page is an index page.
 	 *
-	 * @since 1.3.0 Fallback to post post_type if applicable, add check for $page_id being 0.
+	 * @since 1.3.0 Add check for $page_id being 0 and if matched post type is supported.
 	 * @since 1.0.0
 	 *
 	 * @param int $page_id The ID of the page to check.
@@ -190,9 +196,15 @@ final class Registry {
 			return false;
 		}
 
-		$fallback = $page_id == get_option( 'page_for_posts' ) ? 'post' : false;
+		// Find a post type using that page ID
+		$post_type = array_search( intval( $page_id ), self::$index_pages, true );
 
-		return array_search( intval( $page_id ), self::$index_pages, true ) ?: $fallback;
+		// If found but not a currently supported post type, bail
+		if ( $post_type && ! self::is_post_type_supported( $post_type ) ) {
+			return false;
+		}
+
+		return $post_type;
 	}
 
 	// =========================
