@@ -219,9 +219,9 @@ final class Backend extends Handler {
 	public static function add_index_state( array $post_states, \WP_Post $post ) {
 		// Only proceed if the post is a page
 		if ( $post->post_type == 'page' ) {
-			// Check if it's an assigned index page,
+			// Check if it's an assigned index page (other than for posts),
 			// get the associated post type (and ensure it exists)
-			if ( ( $post_type = Registry::is_index_page( $post->ID ) ) && post_type_exists( $post_type ) ) {
+			if ( ( $post_type = Registry::is_index_page( $post->ID ) ) && $post_type !== 'post' && post_type_exists( $post_type ) ) {
 				// Get the label to use
 				$label = self::get_index_page_label( $post_type );
 
