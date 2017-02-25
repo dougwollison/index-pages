@@ -34,7 +34,10 @@ function get_index_page( $post_type = null, $return = 'id' ) {
 			return $return == 'id' ? $object->ID : $object;
 		} else {
 			// Otherwise, attempt to determine it
-			if ( is_post_type_archive() ) {
+			if ( is_home() ) {
+				// Must be post
+				$post_type = 'post';
+			} elseif ( is_post_type_archive() ) {
 				// If it's a post type archive, use the query var
 				$post_type = get_query_var( 'post_type' );
 			} elseif ( is_tax() || is_tag() || is_category() ) {
