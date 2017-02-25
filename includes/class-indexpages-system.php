@@ -36,5 +36,6 @@ final class System {
 		// Register the hooks of the subsystems
 		Frontend::register_hooks();
 		Backend::register_hooks();
+		Liaison::register_hooks();
 	}
 }
