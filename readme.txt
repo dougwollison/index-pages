@@ -2,8 +2,8 @@
 Contributors: dougwollison
 Tags: index page, custom post type, custom index, page for posts
 Requires at least: 4.0.0
-Tested up to: 4.6.0
-Stable tag: 1.2.0
+Tested up to: 4.7.2
+Stable tag: 1.3.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -52,6 +52,9 @@ This works exactly like `the_post();`, populating the `$post` variable with the 
 == Changelog ==
 
 **Details on each release can be found [on the GitHub releases page](https://github.com/dougwollison/index-pages/releases) for this project.**
+
+= 1.3.0 =
+Improved handling of post types, bug fixes and WPSEO compatibility.
 
 = 1.2.0 =
 Added checks to make sure an index page's associated post type exists.
