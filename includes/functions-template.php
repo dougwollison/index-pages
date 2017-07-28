@@ -180,8 +180,8 @@ function the_term_index_page() {
  *
  * @since 1.0.0
  *
- * @param int|object $post_id          Optional The ID of the post to check.
- * @param string     $$match_post_type Optional The post type to match.
+ * @param int|object $post_id         Optional The ID of the post to check.
+ * @param string     $match_post_type Optional The post type to match.
  *
  * @return string|bool The result of the test.
  */
