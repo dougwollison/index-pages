@@ -218,6 +218,52 @@ function is_index_page( $post_id = null, $match_post_type = null ) {
 }
 
 /**
+ * Check if the a post is an term page.
+ *
+ * If you don't pass a term, it'll return the object of the term
+ * it's the index page for. Otherwise, it'll return true/false.
+ *
+ * @since 1.4.0
+ *
+ * @param int|object $post_id    Optional The ID of the post to check.
+ * @param int|object $match_term Optional The term ID/object to match.
+ *
+ * @return string|bool The result of the test.
+ */
+function is_term_index_page( $post_id = null, $match_term = null ) {
+	global $wpdb;
+
+	// Handle no post or post object, also get the post type
+	if ( is_null( $post_id ) ) {
+		global $post;
+		$post_type = $post->post_type;
+		$post_id = $post->ID;
+	} elseif ( is_object( $post_id ) ) {
+		$post_type = $post_id->post_type;
+		$post_id = $post_id->ID;
+	} else {
+		$post_type = get_post_type( $post_id );
+	}
+
+	// Automatically return false if not a page
+	if ( $post_type != 'page' ) {
+		return false;
+	}
+
+	// Pass the ID to Registry::is_index_page() to get the post type
+	$for_term = Registry::is_term_page( $post_id );
+
+	if ( is_null( $match_term ) ) {
+		// No match requested, return the post type
+		return $for_term;
+	} else {
+		$match_term = get_term( $match_term );
+		// Match test requested, return result
+		return $match_term->term_id == $for_term->term_id;
+	}
+}
+
+/**
  * Return the date archive URL fo the post type.
  *
  * @since 1.0.0
