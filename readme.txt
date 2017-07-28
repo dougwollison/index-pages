@@ -53,6 +53,9 @@ This works exactly like `the_post();`, populating the `$post` variable with the 
 
 **Details on each release can be found [on the GitHub releases page](https://github.com/dougwollison/index-pages/releases) for this project.**
 
+= 1.4.0 =
+Added support for having index pages for taxonomy terms.
+
 = 1.3.0 =
 Improved handling of post types, bug fixes and WPSEO compatibility.
 
