@@ -71,17 +71,95 @@ function get_index_page( $post_type = null, $return = 'id' ) {
 }
 
 /**
- * Setup the postdata for the page for the current index
+ * Get the ID or full post object of the term index page.
  *
+ * @since 1.4.0
+ *
+ * @param int|string|object $term     Optional The term ID/slug/object to get the index page for.
+ * @param string            $return   Optional What to return ('id' or 'object').
+ * @param string            $taxonomy Optional The taxonomy if finding by slug.
+ *
+ * @return bool|int|object The desired return value or NULL on failure.
+ */
+function get_term_index_page( $term = null, $return = 'id', $taxonomy = null ) {
+	// If no term is specified, determine it.
+	if ( is_null( $term ) ) {
+		// Get the queried object
+		$object = get_queried_object();
+
+		// If it's a term page, and the queried object is the term, use that
+		if ( is_category() || is_tag() || is_tax() && is_a( $object, 'WP_Term' ) ) {
+			return get_term_index_page( $object, $return );
+		}
+
+		return null;
+	}
+
+	// Find by slug if needed
+	if ( is_string( $term ) ) {
+		if ( is_null( $taxonomy ) ) {
+			// Can't find by slug without taxonomy.
+			return null;
+		}
+
+		$term = get_term_by( 'slug', $term, $taxonomy );
+	}
+
+	// Get the object if not already an object
+	if ( ! is_object( $term ) ) {
+		$term = get_term( $term, $taxonomy );
+	}
+
+	// Fail if the term/taxonomy doesn't exist or is not supported
+	if ( ! $term || is_wp_error( $term ) || ! taxonomy_exists( $term->taxonomy ) || ! Registry::is_taxonomy_supported( $term->taxonomy ) ) {
+		return null;
+	}
+
+	$page_id = Registry::get_term_page( $term->term_id );
+
+	// Return the desired value
+	return $return == 'id' ? $page_id : get_post( $page_id );
+}
+
+/**
+ * Setup the postdata for the page for the current post-type index
+ *
+ * @since 1.4.0 Added return value and check if get_index_page returned false.
  * @since 1.0.0
  *
- * @see get_index()
+ * @see get_index_page()
  */
 function the_index_page() {
 	global $post;
 
 	$post = get_index_page( null, 'object' );
+
+	if ( is_null( $post ) ) {
+		return false;
+	}
+
 	setup_postdata( $post );
+	return true;
+}
+
+/**
+ * Setup the postdata for the page for the current term index
+ *
+ * @since 1.4.0
+ *
+ * @see get_term_index_page()
+ */
+function the_term_index_page() {
+	global $post;
+
+	$post = get_term_index_page( null, 'object' );
+
+	if ( is_null( $post ) ) {
+		return false;
+	}
+
+	setup_postdata( $post );
+	return true;
 }
 
 /**
