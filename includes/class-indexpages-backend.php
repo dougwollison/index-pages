@@ -36,15 +36,23 @@ final class Backend extends Handler {
 			return;
 		}
 
+		$taxonomies = Registry::get_supported_taxonomies();
+
 		// After-setup stuff
 		self::add_action( 'plugins_loaded', 'load_textdomain' );
 
-		// Settings registration
+		// Settings registration/saving
 		self::add_action( 'admin_init', 'register_settings', 10, 0 );
+		foreach ( $taxonomies as $taxonomy ) {
+			self::add_action( "edited_{$taxonomy}", 'save_index_page', 10, 1 );
+		}
 
 		// Interface additions
 		self::add_filter( 'display_post_states', 'add_index_state', 10, 2 );
 		self::add_action( 'edit_form_after_title', 'add_index_notice', 10, 1 );
+		foreach ( $taxonomies as $taxonomy ) {
+			self::add_action( "{$taxonomy}_edit_form_fields", 'add_index_selector', 10, 1 );
+		}
 	}
 
 	// =========================
@@ -123,17 +131,23 @@ final class Backend extends Handler {
 	}
 
 	// =========================
-	// ! Settings Registration
+	// ! Settings Registration/Saving
 	// =========================
 
 	/**
 	 * Add "Page for * posts" dropdowns to the reading settings page.
 	 *
+	 * @since 1.4.0 Added settings selection for supported taxonomies.
 	 * @since 1.3.0 Now loops through all custom post types and checks for support.
 	 * @since 1.0.0
 	 */
 	public static function register_settings() {
-		$registered = 0;
+		add_settings_section(
+			'index_pages',
+			__( 'Index Pages', 'index-pages' ),
+			array( __CLASS__, 'do_settings_section' ),
+			'reading'
+		);
 
 		foreach ( get_post_types( array( '_builtin' => false ) ) as $post_type ) {
 			// Skip if post type is not supported
@@ -148,7 +162,7 @@ final class Backend extends Handler {
 			add_settings_field(
 				$option_name,
 				self::get_index_page_label( $post_type ),
-				array( __CLASS__, 'do_settings_field' ),
+				array( __CLASS__, 'do_page_selector_field' ),
 				'reading',
 				'index_pages',
 				array(
@@ -156,19 +170,18 @@ final class Backend extends Handler {
 					'post_type' => $post_type,
 				)
 			);
-
-			$registered++;
 		}
 
-		// If any settings were registered, add the settings output
-		if ( $registered > 0 ) {
-			add_settings_section(
-				'index_pages',
-				__( 'Index Pages', 'index-pages' ),
-				array( __CLASS__, 'do_settings_section' ),
-				'reading'
-			);
-		}
+		// Add setting to enable index pages for taxonomy terms
+		register_setting( 'reading', 'index_pages_taxonomies' );
+
+		add_settings_field(
+			'index_pages_taxonomies',
+			__( 'Supported Taxonomies', 'index-pages' ),
+			array( __CLASS__, 'do_taxonomies_dropdown' ),
+			'reading',
+			'index_pages'
+		);
 	}
 
 	/**
@@ -181,13 +194,14 @@ final class Backend extends Handler {
 	}
 
 	/**
-	 * Print an Index Pages settings field.
+	 * Print an page selector dropdown.
 	 *
+	 * @since 1.4.0 Renamed
 	 * @since 1.0.0
 	 *
-	 * @param
+	 * @param array $args The arguments passed in add_settings_field().
 	 */
-	public static function do_settings_field( $args ) {
+	public static function do_page_selector_field( $args ) {
 		extract( $args );
 
 		wp_dropdown_pages( array(
@@ -199,6 +213,41 @@ final class Backend extends Handler {
 			// Include this context flag for use by 3rd party plugins
 			'plugin-context'    => 'index-pages',
 		) );
+	}
+
+	/**
+	 * Print the taxonomies checklist.
+	 *
+	 * @since 1.4.0
+	 */
+	public static function do_taxonomies_dropdown() {
+		$selected = Registry::get_supported_taxonomies();
+
+		$taxonomies = get_taxonomies( array( 'public' => true ), 'objects' );
+		echo '<p>';
+		foreach ( $taxonomies as $taxonomy ) {
+			printf(
+				'<label><input name="%s[]" type="checkbox" value="%s" %s /> %s</label><br /> ',
+				'index_pages_taxonomies',
+				$taxonomy->name,
+				in_array( $taxonomy->name, $selected ) ? 'checked' : '',
+				$taxonomy->label
+			);
+		}
+		echo '</p>';
+	}
+
+	/**
+	 * Save the term's index page setting.
+	 *
+	 * @since 1.4.0
+	 *
+	 * @param int $term_id The ID of the term being edited.
+	 */
+	public static function save_index_page( $term_id ) {
+		if ( isset( $_POST['term_index_page'] ) ) {
+			update_option( "page_for_term_{$term_id}", $_POST['term_index_page'] );
+		}
 	}
 
 	// =========================
@@ -266,5 +315,35 @@ final class Backend extends Handler {
 		}
 
 		printf( '<div class="notice notice-%s inline"><p>%s</p></div>', $notice_type, $notice_text );
+	}
+
+	/**
+	 * Print a page dropdown to select the index page for this term.
+	 *
+	 * @since 1.4.0
+	 *
+	 * @param object The term object.
+	 */
+	public static function add_index_selector( $term ) {
+		?>
+		<tr class="form-field">
+			<th scope="row">
+				<label for="term_index_page"><?php _e( 'Index Page', 'index-pages' ); ?></label>
+			</th>
+			<td>
+				<?php
+				wp_dropdown_pages( array(
+					'selected'          => Registry::get_term_page( $term ),
+					'name'              => 'term_index_page',
+					'id'                => 'term_index_page',
+					'show_option_none'  => __( '&mdash; Select &mdash;' ),
+					'option_none_value' => '0',
+					// Include this context flag for use by 3rd party plugins
+					'plugin-context'    => 'index-pages',
+				) );
+				?>
+			</td>
+		</tr>
+		<?php
 	}
 }
