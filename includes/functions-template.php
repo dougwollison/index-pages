@@ -32,42 +32,42 @@ function get_index_page( $post_type = null, $return = 'id' ) {
 		if ( ( is_post_type_archive() || is_home() ) && is_a( $object, 'WP_Post' ) ) {
 			// Return the desired value
 			return $return == 'id' ? $object->ID : $object;
-		} else {
-			// Otherwise, attempt to determine it
-			if ( is_home() ) {
-				// Must be post
-				$post_type = 'post';
-			} elseif ( is_post_type_archive() ) {
-				// If it's a post type archive, use the query var
-				$post_type = get_query_var( 'post_type' );
-			} elseif ( is_tax() || is_tag() || is_category() ) {
-				// If it's a taxonomy page, assume first object type for the taxonomy
-				$tax = $object->taxonomy;
-				$tax = get_taxonomy( $tax );
-				$post_type = $tax->object_type[0];
-			} elseif ( is_singular() ) {
-				// If single post, use the queried object's post type
-				$post_type = $object->post_type;
-			} else {
-				// No idea
-				return null;
-			}
-
-			// Recall this function with the determined post type
-			return get_index_page( $post_type, $return );
 		}
-	} else {
-		// Return null if it does not exist, or is not a supported post type (unless it's post)
-		if ( ! post_type_exists( $post_type ) || ( ! Registry::is_post_type_supported( $post_type ) && $post_type != 'post' ) ) {
+
+		// Otherwise, attempt to determine it
+		if ( is_home() ) {
+			// Must be post
+			$post_type = 'post';
+		} elseif ( is_post_type_archive() ) {
+			// If it's a post type archive, use the query var
+			$post_type = get_query_var( 'post_type' );
+		} elseif ( is_tax() || is_tag() || is_category() ) {
+			// If it's a taxonomy page, assume first object type for the taxonomy
+			$tax = $object->taxonomy;
+			$tax = get_taxonomy( $tax );
+			$post_type = $tax->object_type[0];
+		} elseif ( is_singular() ) {
+			// If single post, use the queried object's post type
+			$post_type = $object->post_type;
+		} else {
+			// No idea
 			return null;
 		}
 
-		// Get the index page for this post type
-		$page_id = Registry::get_index_page( $post_type );
-
-		// Return the desired value
-		return $return == 'id' ? $page_id : get_post( $page_id );
+		// Recall this function with the determined post type
+		return get_index_page( $post_type, $return );
 	}
+
+	// Return null if it does not exist, or is not a supported post type (unless it's post)
+	if ( ! post_type_exists( $post_type ) || ( ! Registry::is_post_type_supported( $post_type ) && $post_type != 'post' ) ) {
+		return null;
+	}
+
+	// Get the index page for this post type
+	$page_id = Registry::get_index_page( $post_type );
+
+	// Return the desired value
+	return $return == 'id' ? $page_id : get_post( $page_id );
 }
 
 /**
