@@ -47,6 +47,29 @@ final class Registry {
 	 */
 	protected static $index_pages = array();
 
+	/**
+	 * The list of assigned term pages,
+	 * indexed by term ID.
+	 *
+	 * @internal
+	 *
+	 * @since 1.4.0
+	 *
+	 * @var array
+	 */
+	protected static $term_pages = array();
+
+	/**
+	 * The list of supported taxonomies.
+	 *
+	 * @internal
+	 *
+	 * @since 1.4.0
+	 *
+	 * @var array
+	 */
+	protected static $supported_taxonomies = array();
+
 	// =========================
 	// ! Property Accessing
 	// =========================
@@ -83,6 +106,17 @@ final class Registry {
 	}
 
 	/**
+	 * Get the list of supported taxonomies.
+	 *
+	 * @since 1.4.0
+	 *
+	 * @return array The list of supported taxonomies.
+	 */
+	public static function get_supported_taxonomies() {
+		return self::$supported_taxonomies;
+	}
+
+	/**
 	 * Test if a post type is supported.
 	 *
 	 * Will check if it exists and has index-page support or has_archive set.
@@ -106,6 +140,27 @@ final class Registry {
 		}
 
 		return get_post_type_object( $post_type )->has_archive;
+	}
+
+	/**
+	 * Test if a taxonomy is supported.
+	 *
+	 * Will check if it exists and has index-page support or has_archive set.
+	 *
+	 * @since 1.4.0
+	 *
+	 * @param string $taxonomy The taxonomy to check.
+	 */
+	public static function is_taxonomy_supported( $taxonomy ) {
+		if ( ! taxonomy_exists( $taxonomy ) ) {
+			return false;
+		}
+
+		if ( ! in_array( $taxonomy, self::$supported_taxonomies ) ) {
+			return false;
+		}
+
+		return get_taxonomy( $taxonomy )->public;
 	}
 
 	/**
@@ -138,6 +193,34 @@ final class Registry {
 		foreach ( $post_types as $post_type ) {
 			remove_post_type_support( $post_type, 'index-page' );
 		}
+	}
+
+	/**
+	 * Add taxonomies to the support list.
+	 *
+	 * @since 1.4.0
+	 *
+	 * @param string|array $taxonomies A post type or array of post types to add.
+	 */
+	public static function add_taxonomies( $taxonomies ) {
+		$taxonomies = (array) $taxonomies;
+
+		foreach ( $taxonomies as $taxonomy ) {
+			self::$supported_taxonomies[] = $taxonomy;
+		}
+	}
+
+	/**
+	 * Remove post types from the support list.
+	 *
+	 * @since 1.4.0
+	 *
+	 * @param string|array $taxonomies A post type or array of post types to remove.
+	 */
+	public static function remove_taxonomies( $taxonomies ) {
+		$taxonomies = (array) $taxonomies;
+
+		self::$supported_taxonomies = array_diff( self::$supported_taxonomies, $taxonomies );
 	}
 
 	/**
@@ -246,6 +329,15 @@ final class Registry {
 		foreach ( $pages as $page ) {
 			self::$index_pages[ $page->post_type ] = intval( $page->page_id );
 		}
+
+		// Get all page_for_term_* options found.
+		$pages = $wpdb->get_results( "SELECT SUBSTRING(option_name, 15) AS term_id, option_value AS page_id FROM $wpdb->options WHERE option_name LIKE 'page\_for\_term\_%'" );
+		foreach ( $pages as $page ) {
+			self::$term_pages[ intval( $page->term_id ) ] = intval( $page->page_id );
+		}
+
+		// Get the list of supported taxonomies
+		self::$supported_taxonomies = get_option( 'index_pages_taxonomies', array() );
 
 		// Flag that we've loaded everything
 		self::$__loaded = true;
