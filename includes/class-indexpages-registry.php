@@ -190,7 +190,7 @@ final class Registry {
 		/**
 		 * Filter the ID of the index page to check.
 		 *
-		 * @since 1.9.1
+		 * @since 1.0.0
 		 *
 		 * @param int $post_id The ID of the page determined.
 		 */
