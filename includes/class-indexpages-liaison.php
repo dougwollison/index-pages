@@ -68,11 +68,11 @@ final class Liaison extends Handler {
 	 * @since 1.3.0
 	 */
 	public static function wpseo_do_indexpage_replacement( $key, $args ) {
-		// Get the queried post type
-		$post_type = get_query_var( 'post_type', 'post' );
+		// Get the term/post type index page
+		$index_page = get_term_index_page() ?: get_index_page();
 
 		// Get the index for this post type, return it's title if found
-		if ( $index_page = Registry::get_index_page( $post_type ) ) {
+		if ( $index_page ) {
 			return get_the_title( $index_page );
 		}
 
