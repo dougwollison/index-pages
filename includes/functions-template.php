@@ -66,6 +66,11 @@ function get_index_page( $post_type = null, $return = 'id' ) {
 	// Get the index page for this post type
 	$page_id = Registry::get_index_page( $post_type );
 
+	// Check if a page ID was retrieved
+	if ( ! $page_id ) {
+		return null;
+	}
+
 	// Return the desired value
 	return $return == 'id' ? $page_id : get_post( $page_id );
 }
@@ -116,6 +121,11 @@ function get_term_index_page( $term = null, $return = 'id', $taxonomy = null ) {
 	}
 
 	$page_id = Registry::get_term_page( $term->term_id );
+
+	// Check if a page ID was retrieved
+	if ( ! $page_id ) {
+		return null;
+	}
 
 	// Return the desired value
 	return $return == 'id' ? $page_id : get_post( $page_id );
