@@ -258,9 +258,61 @@ final class Registry {
 	}
 
 	/**
+	 * Get the assigned index page for a term.
+	 *
+	 * @since 1.4.0
+	 *
+	 * @param object|int|string $term     The term or ID/slug.
+	 * @param string            $taxonomy The taxonomy if going by slug.
+	 *
+	 * @return int|bool The index page ID, or false if not found.
+	 */
+	public static function get_term_page( $term, $taxonomy = null ) {
+		if ( is_string( $term ) ) {
+			if ( is_null( $taxonomy ) ) {
+				// Can't find by slug without taxonomy.
+				return false;
+			}
+
+			$term = get_term_by( 'slug', $term, $taxonomy );
+		}
+
+		if ( ! is_object( $term ) ) {
+			$term = get_term( $term, $taxonomy );
+		}
+
+		if ( ! $term || is_wp_error( $term ) ) {
+			return false;
+		}
+
+		// Bail if not a supported taxonomy
+		if ( ! self::is_taxonomy_supported( $term->taxonomy ) ) {
+			return false;
+		}
+
+		$page_id = false;
+		if ( isset( self::$term_pages[ $term->term_id ] ) ) {
+			$page_id = self::$term_pages[ $term->term_id ];
+		}
+
+		/**
+		 * Filter the ID of the index page retrieved.
+		 *
+		 * @since 1.8.0
+		 *
+		 * @param int    $page_id  The ID of the page determined.
+		 * @param object $term     The term it's meant for.
+		 * @param string $taxonomy The taxonomy the term belongs to.
+		 */
+		$page_id = apply_filters( 'indexpages_get_term_page', $page_id, $term, $taxonomy );
+
+		return $page_id;
+	}
+
+	/**
 	 * Get the post type for an assigned index page.
 	 *
-	 * Can also be used to check if a page is an index page.
+	 * Can also be used to check if a page is a post-type index page.
 	 *
 	 * @since 1.3.0 Add check for $page_id being 0 and if matched post type is supported.
 	 * @since 1.0.0
@@ -293,6 +345,48 @@ final class Registry {
 		}
 
 		return $post_type;
+	}
+
+	/**
+	 * Get the term for an assigned index page.
+	 *
+	 * Can also be used to check if a page is a term index page.
+	 *
+	 * @since 1.4.0
+	 *
+	 * @param int $page_id The ID of the page to check.
+	 *
+	 * @return object|bool The term it is for, or false if not found.
+	 */
+	public static function is_term_page( $page_id ) {
+		/**
+		 * Filter the ID of the index page to check.
+		 *
+		 * @since 1.4.0
+		 *
+		 * @param int $post_id The ID of the page determined.
+		 */
+		$page_id = apply_filters( 'indexpages_is_term_page', $page_id );
+
+		// If $page_id is somehow 0, return false
+		if ( ! $page_id ) {
+			return false;
+		}
+
+		// Find a post type using that page ID
+		$term_id = array_search( intval( $page_id ), self::$term_pages, true );
+
+		// If found but the term no longer exists, bail
+		if ( $term_id && ! ( $term = get_term( $term_id ) ) ) {
+			return false;
+		}
+
+		// If it doesn't belong to a currently supported taxonomy, bail
+		if ( ! self::is_taxonomy_supported( $term->taxonomy ) ) {
+			return false;
+		}
+
+		return $term;
 	}
 
 	// =========================
