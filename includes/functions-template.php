@@ -15,6 +15,7 @@ use IndexPages\Registry as Registry;
 /**
  * Get the ID or full post object of the index page.
  *
+ * @since 1.4.0 Restrucuted to avoid else > return style.
  * @since 1.0.0
  *
  * @param string $post_type Optional The post type to get the index page for.
