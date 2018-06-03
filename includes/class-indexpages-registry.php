@@ -431,7 +431,7 @@ final class Registry {
 		}
 
 		// Get the list of supported taxonomies
-		self::$supported_taxonomies = get_option( 'index_pages_taxonomies', array() );
+		self::$supported_taxonomies = (array) get_option( 'index_pages_taxonomies', array() );
 
 		// Flag that we've loaded everything
 		self::$__loaded = true;
