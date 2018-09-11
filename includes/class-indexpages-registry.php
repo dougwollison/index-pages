@@ -352,6 +352,7 @@ final class Registry {
 	 *
 	 * Can also be used to check if a page is a term index page.
 	 *
+	 * @since 1.4.1 Fix check for existing term.
 	 * @since 1.4.0
 	 *
 	 * @param int $page_id The ID of the page to check.
@@ -376,8 +377,8 @@ final class Registry {
 		// Find a post type using that page ID
 		$term_id = array_search( intval( $page_id ), self::$term_pages, true );
 
-		// If found but the term no longer exists, bail
-		if ( $term_id && ! ( $term = get_term( $term_id ) ) ) {
+		// If not found or term no longer exists, bail
+		if ( ! $term_id || ! ( $term = get_term( $term_id ) ) ) {
 			return false;
 		}
 
