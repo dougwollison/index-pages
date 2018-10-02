@@ -44,7 +44,7 @@ final class Liaison extends Handler {
 	 * @since 1.3.0
 	 */
 	public static function add_wpseo_helpers() {
-		// Abort if QuickStart isn't present
+		// Abort if WPSEO isn't present
 		if ( ! function_exists( 'wpseo_init' ) ) {
 			return;
 		}
