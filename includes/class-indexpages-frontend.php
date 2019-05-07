@@ -92,16 +92,42 @@ final class Frontend extends Handler {
 			return;
 		}
 
-		// Build a RegExp to capture a page with date/paged arguments
-		$pattern =
-			'(?<pagename>.+?)' . // page name/path
-			'(?:/(?<year>[0-9]{4})' . // optional year...
-				'(?:/(?<monthnum>[0-9]{2})' . // ...with optional month...
-					'(?:/(?<day>[0-9]{2}))?' . // ...and optional day
-				')?' .
-			')?' .
-			'(?:/page/(?<paged>[0-9]+))?' . // and optional page number
-		'/?$';
+		// The groups to match; pagename, date, and page.
+		$groups = array(
+			array(
+				'name' => 'pagename',
+				'optional' => false,
+				'pattern' => '.+?',
+			),
+			array(
+				'name' => 'year',
+				'optional' => true,
+				'pattern' => '[0-9]{4}',
+				'wrapper' => '/%s',
+				'subgroups' => array(
+					array(
+						'name' => 'monthnum',
+						'optional' => true,
+						'pattern' => '[0-9]{2}',
+						'wrapper' => '/%s',
+						'subgroups' => array(
+							array(
+								'name' => 'day',
+								'optional' => true,
+								'pattern' => '[0-9]{2}',
+								'wrapper' => '/%s',
+							),
+						),
+					),
+				),
+			),
+			array(
+				'name' => 'paged',
+				'optional' => true,
+				'pattern' => '[0-9]+',
+				'wrapper' => '/page/%s',
+			),
+		);
 
 		/**
 		 * Filter the RegEx pattern for detecting index pages.
@@ -110,10 +136,18 @@ final class Frontend extends Handler {
 		 *
 		 * @since 1.4.0
 		 *
-		 * @param string $pattern The RegEx pattern.
-		 * @param WP     $wp      The current WordPress environtment instance.
+		 * @see IndexPages\compile_regex_groups() for format.
+		 *
+		 * @param string $groups The RegEx groups array.
+		 * @param WP     $wp     The current WordPress environtment instance.
 		 */
-		$pattern = apply_filters( 'indexpages_regex_pattern', $pattern, $wp );
+		$groups = apply_filters( 'indexpages_regex_groups', $groups, $wp );
+
+		// Compile the groups into a pattern
+		$pattern = compile_regex_groups( $groups );
+
+		// Append mandatory trailing slash part
+		$pattern .= '/?$';
 
 		// Proceed if the pattern checks out
 		if ( preg_match( "#$pattern#", $wp->request, $matches ) ) {
