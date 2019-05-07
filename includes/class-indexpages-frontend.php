@@ -77,14 +77,15 @@ final class Frontend extends Handler {
 	 *
 	 * Also checks for date and pagination parameters.
 	 *
-	 * @since 1.4.0 Added support for term pages.
+	 * @since 1.4.0 Added support for term pages, pattern/vars rewriting.
 	 * @since 1.2.0 Added check to make sure post type currently exists.
 	 * @since 1.0.0
 	 *
 	 * @param WP $wp The WP request object.
 	 */
 	public static function handle_request( \WP $wp ) {
-		$qv =& $wp->query_vars;
+		// Reference the query vars array
+		$qv = &$wp->query_vars;
 
 		// Abort if a pagename wasn't matched at all
 		if ( ! isset( $qv['pagename'] ) ) {
@@ -93,50 +94,69 @@ final class Frontend extends Handler {
 
 		// Build a RegExp to capture a page with date/paged arguments
 		$pattern =
-			'(.+?)'. // page name/path
-			'(?:/([0-9]{4})'. // optional year...
-				'(?:/([0-9]{2})'. // ...with optional month...
-					'(?:/([0-9]{2}))?'. // ...and optional day
-				')?'.
-			')?'.
-			'(?:/page/([0-9]+))?'. // and optional page number
+			'(?<pagename>.+?)' . // page name/path
+			'(?:/(?<year>[0-9]{4})' . // optional year...
+				'(?:/(?<monthnum>[0-9]{2})' . // ...with optional month...
+					'(?:/(?<day>[0-9]{2}))?' . // ...and optional day
+				')?' .
+			')?' .
+			'(?:/page/(?<paged>[0-9]+))?' . // and optional page number
 		'/?$';
+
+		/**
+		 * Filter the RegEx pattern for detecting index pages.
+		 *
+		 * New capture groups SHOULD be named, ideally with query vars.
+		 *
+		 * @since 1.4.0
+		 *
+		 * @param string $pattern The RegEx pattern.
+		 * @param WP     $wp      The current WordPress environtment instance.
+		 */
+		$pattern = apply_filters( 'indexpages_regex_pattern', $pattern, $wp );
 
 		// Proceed if the pattern checks out
 		if ( preg_match( "#$pattern#", $wp->request, $matches ) ) {
-			// Get the page using match 1 (pagename)
-			$page = get_page_by_path( $matches[1] );
+			// Create the "true" vars
+			$true_vars = array();
+			foreach ( $matches as $group => $match ) {
+				if ( ! is_numeric( $group ) ) {
+					$true_vars[ $group ] = $match;
+				}
+			}
+
+			// Get the page matching the pagename
+			$page = get_page_by_path( $true_vars['pagename'] );
 
 			// Abort if no page is found
 			if ( is_null( $page ) ) {
 				return;
 			}
 
+			// Clear the page related query vars
+			$true_vars['pagename'] = '';
+			$true_vars['page'] = '';
+			$true_vars['name'] = '';
+
 			// Get the post type, and validate that it exists
 			if ( $post_type = Registry::is_index_page( $page->ID ) ) {
 				// Modify the request into a post type archive instead
-				$qv['post_type'] = $post_type;
-				list( , , $qv['year'], $qv['monthnum'], $qv['day'], $qv['paged'] ) = array_pad( $matches, 6, null );
-
-				// Make sure these are unset
-				unset( $qv['pagename'] );
-				unset( $qv['page'] );
-				unset( $qv['name'] );
+				$true_vars['post_type'] = $post_type;
 			} else
 			// Alternatively, get the term, and validate that it exists
 			if ( $term = Registry::is_term_page( $page->ID ) ) {
 				// Modify the request into a post type archive instead
 				switch ( $term->taxonomy ) {
 					case 'category':
-						$qv['cat'] = $term->term_id;
+						$true_vars['cat'] = $term->term_id;
 						break;
 
 					case 'post_tag':
-						$qv['tag_id'] = $term->term_id;
+						$true_vars['tag_id'] = $term->term_id;
 						break;
 
 					default:
-						$qv['tax_query'] = array(
+						$true_vars['tax_query'] = array(
 							array(
 								'taxonomy' => $term->taxonomy,
 								'field' => 'term_id',
@@ -144,13 +164,21 @@ final class Frontend extends Handler {
 							),
 						);
 				}
-				list( , , $qv['year'], $qv['monthnum'], $qv['day'], $qv['paged'] ) = array_pad( $matches, 6, null );
-
-				// Make sure these are unset
-				unset( $qv['pagename'] );
-				unset( $qv['page'] );
-				unset( $qv['name'] );
 			}
+
+			/**
+			 * Filter the "true" query vars to override with.
+			 *
+			 * @since 1.4.0
+			 *
+			 * @param array $pattern The list of true query vars.
+			 * @param array $matches The full matches from the RegEx, named and unnamed groups.
+			 * @param WP    $wp      The current WordPress environtment instance.
+			 */
+			$true_vars = apply_filters( 'indexpages_true_vars', $true_vars, $matches, $wp );
+
+			// Merge the query vars
+			$wp->query_vars = array_merge( $qv, $true_vars );
 		}
 	}
 
