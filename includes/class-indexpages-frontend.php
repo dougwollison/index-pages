@@ -198,6 +198,8 @@ final class Frontend extends Handler {
 							),
 						);
 				}
+			} else {
+				return;
 			}
 
 			/**
