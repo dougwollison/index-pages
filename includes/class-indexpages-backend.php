@@ -227,11 +227,11 @@ final class Backend extends Handler {
 		echo '<p>';
 		foreach ( $taxonomies as $taxonomy ) {
 			printf(
-				'<label><input name="%s[]" type="checkbox" value="%s" %s /> %s</label><br /> ',
+				'<label title="%2$s"><input name="%1$s[]" type="checkbox" value="%2$s" %4$s /> %3$s</label><br /> ',
 				'index_pages_taxonomies',
 				$taxonomy->name,
-				in_array( $taxonomy->name, $selected ) ? 'checked' : '',
-				$taxonomy->label
+				$taxonomy->label,
+				in_array( $taxonomy->name, $selected ) ? 'checked' : ''
 			);
 		}
 		echo '</p>';
