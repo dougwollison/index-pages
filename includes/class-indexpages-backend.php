@@ -218,6 +218,7 @@ final class Backend extends Handler {
 	/**
 	 * Print the taxonomies checklist.
 	 *
+	 * @since 1.4.1 Write taxonomy slug to label title for added context.
 	 * @since 1.4.0
 	 */
 	public static function do_taxonomies_dropdown() {
