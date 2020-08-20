@@ -199,20 +199,29 @@ final class Backend extends Handler {
 	 * @since 1.4.0 Renamed
 	 * @since 1.0.0
 	 *
-	 * @param array $args The arguments passed in add_settings_field().
+	 * @param array $config The arguments passed in add_settings_field().
 	 */
-	public static function do_page_selector_field( $args ) {
-		extract( $args );
-
-		wp_dropdown_pages( array(
-			'selected'          => Registry::get_index_page( $post_type ),
-			'name'              => $label_for,
-			'id'                => $label_for,
+	public static function do_page_selector_field( $config ) {
+		$args = array(
+			'selected'          => Registry::get_index_page( $config['post_type'] ),
+			'name'              => $config['label_for'],
+			'id'                => $config['label_for'],
 			'show_option_none'  => __( '&mdash; Select &mdash;' ),
 			'option_none_value' => '0',
 			// Include this context flag for use by 3rd party plugins
 			'plugin-context'    => 'index-pages',
-		) );
+		);
+
+		/**
+		 * Filter the arguments for wp_dropdown_pages() for term index page selecting.
+		 *
+		 * @param array         $args   The arguments for wp_dropdown_pages().
+		 * @param string        $type   The type of object this will be for (term vs post_type).
+		 * @param string|object $object The object this will be for.
+		 */
+		$args = apply_filters( 'indexpages_dropdown_pages_args', $args, 'post_type', $config['post_type'] );
+
+		wp_dropdown_pages( $args );
 	}
 
 	/**
@@ -326,23 +335,25 @@ final class Backend extends Handler {
 	 * @param object The term object.
 	 */
 	public static function add_index_selector( $term ) {
+		$args = array(
+			'selected'          => Registry::get_term_page( $term ),
+			'name'              => 'term_index_page',
+			'id'                => 'term_index_page',
+			'show_option_none'  => __( '&mdash; Select &mdash;' ),
+			'option_none_value' => '0',
+			// Include this context flag for use by 3rd party plugins
+			'plugin-context'    => 'index-pages',
+		);
+
+		 /** This filter is documented in IndexPages\Backend::do_page_selector_field() */
+		$args = apply_filters( 'indexpages_dropdown_pages_args', $args, 'term', $term );
 		?>
 		<tr class="form-field">
 			<th scope="row">
 				<label for="term_index_page"><?php _e( 'Index Page', 'index-pages' ); ?></label>
 			</th>
 			<td>
-				<?php
-				wp_dropdown_pages( array(
-					'selected'          => Registry::get_term_page( $term ),
-					'name'              => 'term_index_page',
-					'id'                => 'term_index_page',
-					'show_option_none'  => __( '&mdash; Select &mdash;' ),
-					'option_none_value' => '0',
-					// Include this context flag for use by 3rd party plugins
-					'plugin-context'    => 'index-pages',
-				) );
-				?>
+				<?php wp_dropdown_pages( $args ); ?>
 			</td>
 		</tr>
 		<?php
