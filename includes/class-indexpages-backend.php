@@ -196,7 +196,7 @@ final class Backend extends Handler {
 	/**
 	 * Print an page selector dropdown.
 	 *
-	 * @since 1.4.0 Renamed
+	 * @since 1.4.0 Renamed, filterable wp_dropdown_pages() args.
 	 * @since 1.0.0
 	 *
 	 * @param array $config The arguments passed in add_settings_field().
