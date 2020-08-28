@@ -49,7 +49,7 @@ final class Backend extends Handler {
 
 		// Interface additions
 		self::add_filter( 'display_post_states', 'add_index_state', 10, 2 );
-		self::add_action( 'edit_form_after_title', 'add_index_notice', 10, 1 );
+		self::add_action( 'admin_head', 'handle_editor_notice', 10, 1 );
 		foreach ( $taxonomies as $taxonomy ) {
 			self::add_action( "{$taxonomy}_edit_form_fields", 'add_index_selector', 10, 1 );
 		}
@@ -294,29 +294,53 @@ final class Backend extends Handler {
 	}
 
 	/**
+	 * Determines where admin notice should go, disabling posts page version.
+	 *
+	 * Block editor = admin_notices, Classic editor = edit_form_after_title
+	 * Will re-instate editor for posts page and replace notice.
+	 *
+	 * @since 1.4.1
+	 */
+	public static function handle_editor_notice() {
+		// If the old posts page notice is set, replace it and restore Editor support
+		if ( has_action( 'edit_form_after_title', '_wp_posts_page_notice' ) ) {
+			remove_action( 'edit_form_after_title', '_wp_posts_page_notice' );
+			add_post_type_support( 'post', 'editor' );
+
+			self::add_action( 'edit_form_after_title', 'maybe_do_index_notice', 10, 1 );
+		} else {
+			self::add_action( 'admin_notices', 'maybe_do_index_notice', 10, 0 );
+		}
+	}
+
+	/**
 	 * Print a notice about the current page being an index page.
 	 *
 	 * Unlike WordPress for the Posts page, it will not disabled the editor.
 	 *
+	 * @since 1.4.1 Renamed, now prints link to manage said post type, can run in admin_notices.
 	 * @since 1.3.0 Modified notice to only mention lack of content display when index-pages support is absent.
 	 * @since 1.2.1 Rejigged check to handle deprecated index pages.
 	 * @since 1.1.0 Added missing static keyword
 	 * @since 1.0.0
 	 *
-	 * @param WP_Post $post The post in question.
+	 * @param WP_Post $post Optional. The post in question.
 	 */
-	public static function add_index_notice( \WP_Post $post ) {
+	public static function maybe_do_index_notice( \WP_Post $post = null ) {
+		$post = get_post( $post );
+
 		// Abort if not a page or not an index page
-		if ( $post->post_type != 'page' || ! ( $post_type = Registry::is_index_page( $post->ID ) ) || ! post_type_exists( $post_type ) ) {
+		if ( ! $post || $post->post_type != 'page' || ! ( $post_type = Registry::is_index_page( $post->ID ) ) || ! post_type_exists( $post_type ) ) {
 			return;
 		}
 
 		// Get the plural labe to use
 		$label = strtolower( get_post_type_object( $post_type )->label );
+		$link = sprintf( '<a href="%s" target="_blank">%s</a>', admin_url( 'edit.php?post_type=' . $post_type ), $label );
 
 		// Default notice type/message
 		$notice_type = 'info';
-		$notice_text = sprintf( __( 'You are currently editing the page that shows your latest %s.', 'index-pages' ), $label );
+		$notice_text = sprintf( __( 'You are currently editing the page that shows your latest %s.', 'index-pages' ), $link );
 
 		// If the post type doesn't explicitly support index-pages, mention content may not be displayed.
 		if ( ! post_type_supports( $post_type, 'index-page' ) ) {
