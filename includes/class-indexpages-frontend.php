@@ -57,7 +57,7 @@ final class Frontend extends Handler {
 		self::add_action( 'parse_request', 'handle_request', 10, 1 );
 
 		// Title/link rewriting
-		self::add_filter( 'wp_title_parts', 'rewrite_title_parts', 10, 1 );
+		self::add_filter( 'post_type_archive_title', 'rewrite_archive_title', 10, 2 );
 		self::add_filter( 'post_type_archive_link', 'rewrite_archive_link', 10, 2 );
 		self::add_filter( 'term_link', 'rewrite_term_link', 10, 2 );
 
@@ -223,38 +223,21 @@ final class Frontend extends Handler {
 	// =========================
 
 	/**
-	 * Filter the title parts to use the assigned index page's title.
+	 * Filter the post type archive title, use index page's title.
 	 *
-	 * @since 1.4.0 Added support for term pages.
-	 * @since 1.0.0
+	 * @since 1.5.0
 	 *
-	 * @param array $title The title parts to filter.
+	 * @param string $title     The archive title to use.
+	 * @param string $post_type The current post type.
 	 *
-	 * @return array The filtered title parts.
+	 * @return string The filtered archive title.
 	 */
-	public static function rewrite_title_parts( array $title_parts ) {
-		// Handle post type index if applicable
-		if ( is_post_type_archive() ) {
-			// Get the queried post type
-			$post_type = get_query_var( 'post_type', 'post' );
-
-			// Get the index for this post type, update the title if found
-			if ( $index_page = Registry::get_index_page( $post_type ) ) {
-				$title_parts[0] = get_the_title( $index_page );
-			}
-		} else
-		// Alternatively, handle term index if applicable
-		if ( is_category() || is_tag() || is_tax() ) {
-			// Get the queried term
-			$term = get_queried_object();
-
-			// Get the index for this post type, update the title if found
-			if ( $index_page = Registry::get_term_page( $term ) ) {
-				$title_parts[0] = get_the_title( $index_page );
-			}
+	public static function rewrite_archive_title( $title, $post_type ) {
+		if ( $index_page = Registry::get_index_page( $post_type ) ) {
+			return get_the_title( $index_page );
 		}
 
-		return $title_parts;
+		return $title;
 	}
 
 	/**
