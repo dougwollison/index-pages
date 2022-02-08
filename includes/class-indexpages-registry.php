@@ -314,37 +314,48 @@ final class Registry {
 	 *
 	 * Can also be used to check if a page is a post-type index page.
 	 *
+	 * @since 1.4.0 Add option to find ALL post types page is registered for.
 	 * @since 1.3.0 Add check for $page_id being 0 and if matched post type is supported.
 	 * @since 1.0.0
 	 *
-	 * @param int $page_id The ID of the page to check.
+	 * @param int  $page_id  The ID of the page to check.
+	 * @param bool $find_all Optional. Wether or not to return array of ALL matches for page.
 	 *
-	 * @return string|bool The post type it is for, or false if not found.
+	 * @return string|string[]|bool The post type it is for, or false if not found.
 	 */
-	public static function is_index_page( $page_id ) {
+	public static function is_index_page( $page_id, $find_all = false ) {
 		/**
 		 * Filter the ID of the index page to check.
 		 *
 		 * @since 1.0.0
 		 *
-		 * @param int $post_id The ID of the page determined.
+		 * @param int  $post_id  The ID of the page determined.
+		 * @param bool $find_all Wether or not all matches are desired.
 		 */
-		$page_id = apply_filters( 'indexpages_is_index_page', $page_id );
+		$page_id = apply_filters( 'indexpages_is_index_page', $page_id, $find_all );
 
 		// If $page_id is somehow 0, return false
 		if ( ! $page_id ) {
 			return false;
 		}
 
-		// Find a post type using that page ID
-		$post_type = array_search( intval( $page_id ), self::$index_pages, true );
+		// Find all post types using that page ID
+		$post_types = array();
+		foreach ( self::$index_pages as $post_type => $p ) {
+			if ( $p === intval( $page_id ) && self::is_post_type_supported( $post_type ) ) {
+				$post_types[] = $post_type;
+			}
+		}
 
-		// If found but not a currently supported post type, bail
-		if ( $post_type && ! self::is_post_type_supported( $post_type ) ) {
+		if ( $find_all ) {
+			return $post_types;
+		}
+
+		if ( ! $post_types ) {
 			return false;
 		}
 
-		return $post_type;
+		return $post_types[0];
 	}
 
 	/**
