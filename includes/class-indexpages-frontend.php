@@ -55,6 +55,7 @@ final class Frontend extends Handler {
 
 		// Request handling
 		self::add_action( 'parse_request', 'handle_request', 10, 1 );
+		self::add_action( 'parse_query', 'patch_query', 10, 1 );
 
 		// Title/link rewriting
 		self::add_filter( 'post_type_archive_title', 'rewrite_archive_title', 10, 2 );
@@ -216,6 +217,26 @@ final class Frontend extends Handler {
 
 			// Merge the query vars
 			$wp->query_vars = array_merge( $qv, $true_vars );
+		}
+	}
+
+	/**
+	 * Fix the is_archive/is_home flags on the query.
+	 *
+	 * @since 1.4.0
+	 *
+	 * @param WP_Query $query The WP_Query instance (passed by reference).
+	 */
+	public static function patch_query( $query ) {
+		if ( ! $query->get( 'index_page' ) ) {
+			return;
+		}
+
+		$post_types = (array) $query->get( 'post_type' );
+		if ( $post_types && ! $query->is_archive && $query->is_home ) {
+			$query->is_archive = true;
+			$query->is_post_type_archive = true;
+			$query->is_home = in_array( 'post', $post_types );
 		}
 	}
 
