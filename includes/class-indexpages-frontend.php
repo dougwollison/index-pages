@@ -173,9 +173,9 @@ final class Frontend extends Handler {
 			$true_vars['name'] = '';
 
 			// Get the post type, and validate that it exists
-			if ( $post_type = Registry::is_index_page( $page->ID ) ) {
+			if ( $post_types = Registry::is_index_page( $page->ID, 'find_all' ) ) {
 				// Modify the request into a post type archive instead
-				$true_vars['post_type'] = $post_type;
+				$true_vars['post_type'] = $post_types;
 			} else
 			// Alternatively, get the term, and validate that it exists
 			if ( $term = Registry::is_term_page( $page->ID ) ) {

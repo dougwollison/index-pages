@@ -282,10 +282,14 @@ final class Backend extends Handler {
 		if ( $post->post_type == 'page' ) {
 			// Check if it's an assigned index page (other than for posts),
 			// get the associated post type (and ensure it exists)
-			if ( ( $post_type = Registry::is_index_page( $post->ID ) ) && $post_type !== 'post' && post_type_exists( $post_type ) ) {
+			$post_types = Registry::is_index_page( $post->ID, 'find_all' );
+			foreach ( $post_types as $post_type ) {
+				if (  $post_type === 'post' || ! post_type_exists( $post_type ) ) {
+					continue;
+				}
+
 				// Get the label to use
 				$label = self::get_index_page_label( $post_type );
-
 				$post_states[ "page_for_{$post_type}_posts" ] = $label;
 			}
 		}
