@@ -171,6 +171,7 @@ final class Frontend extends Handler {
 			$true_vars['pagename'] = '';
 			$true_vars['page'] = '';
 			$true_vars['name'] = '';
+			$true_vars['index_page'] = $page->ID;
 
 			// Get the post type, and validate that it exists
 			if ( $post_types = Registry::is_index_page( $page->ID, 'find_all' ) ) {
