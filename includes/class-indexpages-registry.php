@@ -314,6 +314,7 @@ final class Registry {
 	 *
 	 * Can also be used to check if a page is a post-type index page.
 	 *
+	 * @since 1.3.1 Handle multiple post type matches, return first supported one.
 	 * @since 1.3.0 Add check for $page_id being 0 and if matched post type is supported.
 	 * @since 1.0.0
 	 *
@@ -336,15 +337,14 @@ final class Registry {
 			return false;
 		}
 
-		// Find a post type using that page ID
-		$post_type = array_search( intval( $page_id ), self::$index_pages, true );
+		// Find all uses of this page as an index page
+		$matched_pages = array_filter( self::$index_pages, fn( $index_page_id ) => $index_page_id == $page_id);
 
-		// If found but not a currently supported post type, bail
-		if ( $post_type && ! self::is_post_type_supported( $post_type ) ) {
-			return false;
-		}
+		// Filter out any that are for not-currently supported post types
+		$post_types = array_filter( array_keys( $matched_pages ), fn( $post_type ) => self::is_post_type_supported( $post_type ) );
 
-		return $post_type;
+		// Return first match
+		return reset( $post_types ) ?: false;
 	}
 
 	/**
