@@ -56,10 +56,8 @@ final class Frontend extends Handler {
 		// Request handling
 		self::add_action( 'parse_request', 'handle_request', 10, 1 );
 
-		// Title/link rewriting
+		// Title rewriting
 		self::add_filter( 'post_type_archive_title', 'rewrite_archive_title', 10, 2 );
-		self::add_filter( 'post_type_archive_link', 'rewrite_archive_link', 10, 2 );
-		self::add_filter( 'term_link', 'rewrite_term_link', 10, 2 );
 
 		// Nav menu rewriting
 		self::add_filter( 'wp_nav_menu_objects', 'handle_index_page_links', 10, 1 );
@@ -219,7 +217,7 @@ final class Frontend extends Handler {
 	}
 
 	// =========================
-	// ! Title/Link Rewriting
+	// ! Title Rewriting
 	// =========================
 
 	/**
@@ -238,42 +236,6 @@ final class Frontend extends Handler {
 		}
 
 		return $title;
-	}
-
-	/**
-	 * Filter the post type archive link to use the assigned index page's permalink.
-	 *
-	 * @since 1.0.0
-	 *
-	 * @param string $link      The permalink to filter.
-	 * @param string $post_type The post type this is for.
-	 *
-	 * @return string The filtered archive link.
-	 */
-	public static function rewrite_archive_link( $link, $post_type ) {
-		if ( $index = Registry::get_index_page( $post_type ) ) {
-			$link = get_permalink( $index );
-		}
-
-		return $link;
-	}
-
-	/**
-	 * Filter the term link to use the assigned index page's permalink.
-	 *
-	 * @since 1.4.0
-	 *
-	 * @param string $link The permalink to filter.
-	 * @param object $term The term this is for.
-	 *
-	 * @return string The filtered term link.
-	 */
-	public static function rewrite_term_link( $link, $term ) {
-		if ( $index = Registry::get_term_page( $term ) ) {
-			$link = get_permalink( $index );
-		}
-
-		return $link;
 	}
 
 	// =========================
