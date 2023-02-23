@@ -174,19 +174,25 @@ final class Frontend extends Handler {
 
 			// Get the post type, and validate that it exists
 			if ( $post_types = Registry::is_index_page( $page->ID, 'find_all' ) ) {
-				// Modify the request into a post type archive instead
-				$true_vars['post_type'] = $post_types;
+				if ( empty( $qv['post_type'] ) ) {
+					// Modify the request into a post type archive instead
+					$true_vars['post_type'] = $post_types;
+				}
 			} else
 			// Alternatively, get the term, and validate that it exists
 			if ( $term = Registry::is_term_page( $page->ID ) ) {
 				// Modify the request into a post type archive instead
 				switch ( $term->taxonomy ) {
 					case 'category':
-						$true_vars['cat'] = $term->term_id;
+						if ( empty( $qv['cat'] ) && empty( $qv['category_name'] ) ) {
+							$true_vars['cat'] = $term->term_id;
+						}
 						break;
 
 					case 'post_tag':
-						$true_vars['tag_id'] = $term->term_id;
+						if ( empty( $qv['tag_id'] ) && empty( $qv['tag'] ) ) {
+							$true_vars['tag_id'] = $term->term_id;
+						}
 						break;
 
 					default:
