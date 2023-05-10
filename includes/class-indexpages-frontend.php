@@ -174,10 +174,12 @@ final class Frontend extends Handler {
 				return;
 			}
 
-			// Clear the page related query vars
-			$true_vars['pagename'] = '';
-			$true_vars['page'] = '';
-			$true_vars['name'] = '';
+			// Clear the page related query vars if post type or term is found
+			if ( $post_type || $term ) {
+				$true_vars['pagename'] = '';
+				$true_vars['page'] = '';
+				$true_vars['name'] = '';
+			}
 
 			// Get the post type, and validate that it exists
 			if ( $post_type ) {
@@ -205,8 +207,6 @@ final class Frontend extends Handler {
 							),
 						);
 				}
-			} else {
-				return;
 			}
 
 			/**
