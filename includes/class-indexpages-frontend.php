@@ -214,11 +214,12 @@ final class Frontend extends Handler {
 			 *
 			 * @since 1.4.0
 			 *
-			 * @param array $pattern The list of true query vars.
-			 * @param array $matches The full matches from the RegEx, named and unnamed groups.
-			 * @param WP    $wp      The current WordPress environtment instance.
+			 * @param array   $pattern The list of true query vars.
+			 * @param array   $matches The full matches from the RegEx, named and unnamed groups.
+			 * @param WP      $wp      The current WordPress environtment instance.
+			 * @param WP_Post $page  The page matched to the current path.
 			 */
-			$true_vars = apply_filters( 'indexpages_true_vars', $true_vars, $matches, $wp );
+			$true_vars = apply_filters( 'indexpages_true_vars', $true_vars, $matches, $wp, $page );
 
 			// Merge the query vars
 			$wp->query_vars = array_merge( $qv, $true_vars );
