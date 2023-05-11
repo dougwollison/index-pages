@@ -293,13 +293,9 @@ final class Frontend extends Handler {
 	 * @param WP_Admin_Bar $wp_admin_bar The admin bar object.
 	 */
 	public static function add_edit_button( \WP_Admin_Bar $wp_admin_bar ) {
-		// Abort if not an archive for the supported post types
-		if ( is_post_type_archive() ) {
-			$index_page = Registry::get_index_page( get_query_var( 'post_type' ) );
-		} else
-		if ( is_category() || is_tag() || is_tax() ) {
-			$index_page = Registry::get_term_page( get_queried_object() );
-		} else {
+		// Check if we're on an index page
+		$index_page = get_term_index_page() ?: get_index_page();
+		if ( ! $index_page ) {
 			return;
 		}
 
