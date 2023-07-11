@@ -180,29 +180,37 @@ final class Frontend extends Handler {
 				}
 			} else
 			// Alternatively, get the term, and validate that it exists
-			if ( $term = Registry::is_term_page( $page->ID ) ) {
-				// Modify the request into a post type archive instead
-				switch ( $term->taxonomy ) {
-					case 'category':
-						if ( empty( $qv['cat'] ) && empty( $qv['category_name'] ) ) {
-							$true_vars['cat'] = $term->term_id;
-						}
-						break;
+			if ( $terms = Registry::is_term_page( $page->ID, 'find_all' ) ) {
+				$terms_by_taxonomy = array();
+				foreach ( $terms as $term_id ) {
+					$term = get_term( $term_id );
+					$terms_by_taxonomy[ $term->taxonomy ] = $term->term_id;
+				}
 
-					case 'post_tag':
-						if ( empty( $qv['tag_id'] ) && empty( $qv['tag'] ) ) {
-							$true_vars['tag_id'] = $term->term_id;
-						}
-						break;
+				foreach ( $terms_by_taxonomy as $taxonomy => $term_ids ) {
+					// Modify the request into a post type archive instead
+					switch ( $taxonomy ) {
+						case 'category':
+							if ( empty( $qv['cat'] ) && empty( $qv['category_name'] ) ) {
+								$true_vars['cat'] = $term->term_id;
+							}
+							break;
 
-					default:
-						$true_vars['tax_query'] = array(
-							array(
-								'taxonomy' => $term->taxonomy,
-								'field' => 'term_id',
-								'terms' => $term->term_id,
-							),
-						);
+						case 'post_tag':
+							if ( empty( $qv['tag_id'] ) && empty( $qv['tag'] ) ) {
+								$true_vars['tag_id'] = $term->term_id;
+							}
+							break;
+
+						default:
+							$true_vars['tax_query'] = array(
+								array(
+									'taxonomy' => $taxonomy,
+									'field' => 'term_id',
+									'terms' => $term_ids,
+								),
+							);
+					}
 				}
 			} else {
 				return;

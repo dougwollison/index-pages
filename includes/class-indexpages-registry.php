@@ -363,14 +363,14 @@ final class Registry {
 	 *
 	 * Can also be used to check if a page is a term index page.
 	 *
-	 * @since 1.4.1 Fix check for existing term.
-	 * @since 1.4.0
+	 * @since 1.4.0 Add option to find ALL terms page is registered for, ensure terms exist.
 	 *
-	 * @param int $page_id The ID of the page to check.
+	 * @param int  $page_id  The ID of the page to check.
+	 * @param bool $find_all Optional. Wether or not to return array of ALL matches for page.
 	 *
 	 * @return object|bool The term it is for, or false if not found.
 	 */
-	public static function is_term_page( $page_id ) {
+	public static function is_term_page( $page_id, $find_all = false  ) {
 		/**
 		 * Filter the ID of the index page to check.
 		 *
@@ -385,20 +385,24 @@ final class Registry {
 			return false;
 		}
 
-		// Find a post type using that page ID
-		$term_id = array_search( intval( $page_id ), self::$term_pages, true );
+		// Find all post types using that page ID
+		$terms = array();
+		foreach ( self::$term_pages as $term_id => $p ) {
+			$term = get_term( $term_id );
+			if ( $term && $p === intval( $page_id ) && self::is_taxonomy_supported( $term->taxonomy ) ) {
+				$terms[] = $term_id;
+			}
+		}
 
-		// If not found or term no longer exists, bail
-		if ( ! $term_id || ! ( $term = get_term( $term_id ) ) ) {
+		if ( $find_all ) {
+			return $terms;
+		}
+
+		if ( ! $terms ) {
 			return false;
 		}
 
-		// If it doesn't belong to a currently supported taxonomy, bail
-		if ( ! self::is_taxonomy_supported( $term->taxonomy ) ) {
-			return false;
-		}
-
-		return $term;
+		return $terms[0];
 	}
 
 	// =========================
