@@ -76,7 +76,7 @@ final class Frontend extends Handler {
 	 *
 	 * Also checks for date and pagination parameters.
 	 *
-	 * @since 1.4.0 Added support for term pages, pattern/vars rewriting.
+	 * @since 1.4.0 Fixed posts page handling, added support for term pages, pattern/vars rewriting.
 	 * @since 1.2.0 Added check to make sure post type currently exists.
 	 * @since 1.0.0
 	 *
@@ -166,6 +166,15 @@ final class Frontend extends Handler {
 				return;
 			}
 
+			// Ge the post type or term this page is assigned to
+			$post_types = Registry::is_index_page( $page->ID, 'find_all' );
+			$terms = Registry::is_term_page( $page->ID, 'find_all' );
+
+			// Posts page, abort and leave to default logic
+			if ( count( $post_types ) === 1 && $post_types[0] === 'post' ) {
+				return;
+			}
+
 			// Clear the page related query vars
 			$true_vars['pagename'] = '';
 			$true_vars['page'] = '';
@@ -173,14 +182,14 @@ final class Frontend extends Handler {
 			$true_vars['index_page'] = $page->ID;
 
 			// Get the post type, and validate that it exists
-			if ( $post_types = Registry::is_index_page( $page->ID, 'find_all' ) ) {
+			if ( $post_types ) {
 				if ( empty( $qv['post_type'] ) ) {
 					// Modify the request into a post type archive instead
 					$true_vars['post_type'] = $post_types;
 				}
 			} else
 			// Alternatively, get the term, and validate that it exists
-			if ( $terms = Registry::is_term_page( $page->ID, 'find_all' ) ) {
+			if ( $terms ) {
 				$terms_by_taxonomy = array();
 				foreach ( $terms as $term_id ) {
 					$term = get_term( $term_id );
