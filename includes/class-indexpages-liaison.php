@@ -70,10 +70,10 @@ final class Liaison extends Handler {
 	 */
 	public static function wpseo_do_indexpage_replacement( $key, $args ) {
 		// Get the queried post type
-		$post_type = get_query_var( 'post_type', 'post' );
+		$post_types = (array) get_query_var( 'post_type', 'post' );
 
 		// Get the index for this post type, return it's title if found
-		if ( $index_page = Registry::get_index_page( $post_type ) ) {
+		if ( $index_page = Registry::get_index_page( $post_types[0] ) ) {
 			// Try the custom SEO title if set, strip out placeholders
 			$seo_title = get_post_meta( $index_page, '_yoast_wpseo_title', true );
 			if ( $seo_title ) {
