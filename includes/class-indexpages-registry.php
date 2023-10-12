@@ -226,14 +226,19 @@ final class Registry {
 	/**
 	 * Get the assigned index page for a post type.
 	 *
+	 * @since 1.4.0 Handle $post_type being an array.
 	 * @since 1.3.0 Updated to use is_post_type_supported().
 	 * @since 1.0.0
 	 *
-	 * @param string $post_type The post type to look for.
+	 * @param string|string[] $post_type The post type to look for.
 	 *
 	 * @return int|bool The index page ID, or false if not found.
 	 */
 	public static function get_index_page( $post_type ) {
+		if ( is_array( $post_type ) ) {
+			$post_type = reset( $post_type );
+		}
+
 		// Bail if not a supported post type
 		if ( ! self::is_post_type_supported( $post_type ) ) {
 			return false;
