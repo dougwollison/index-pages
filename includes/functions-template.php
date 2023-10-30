@@ -42,7 +42,7 @@ function get_index_page( $post_type = null, $return = 'id' ) {
 		} elseif ( is_post_type_archive() ) {
 			// If it's a post type archive, use the query var
 			$post_type = get_query_var( 'post_type' );
-		} elseif ( is_tax() || is_tag() || is_category() ) {
+		} elseif ( is_a( $object, 'WP_Term' ) ) {
 			// If it's a taxonomy page, assume first object type for the taxonomy
 			$tax = $object->taxonomy;
 			$tax = get_taxonomy( $tax );
