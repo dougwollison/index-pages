@@ -277,7 +277,7 @@ final class Frontend extends Handler {
 	/**
 	 * Add an Edit Index Page button to the admin bar if applicable.
 	 *
-	 * @since 1.4.0 Added support for term pages.
+	 * @since 1.4.0 Fix posts page support, add support for term pages.
 	 * @since 1.0.0
 	 *
 	 * @param WP_Admin_Bar $wp_admin_bar The admin bar object.
@@ -289,6 +289,9 @@ final class Frontend extends Handler {
 		} else
 		if ( is_category() || is_tag() || is_tax() ) {
 			$index_page = Registry::get_term_page( get_queried_object() );
+		} else
+		if ( is_home() ) {
+			$index_page = Registry::get_index_page( 'post' );
 		} else {
 			return;
 		}
