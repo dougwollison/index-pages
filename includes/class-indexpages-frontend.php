@@ -287,15 +287,22 @@ final class Frontend extends Handler {
 	/**
 	 * Add an Edit Index Page button to the admin bar if applicable.
 	 *
-	 * @since 1.4.0 Added support for term pages.
+	 * @since 1.4.0 Fix posts page support, add support for term pages.
 	 * @since 1.0.0
 	 *
 	 * @param WP_Admin_Bar $wp_admin_bar The admin bar object.
 	 */
 	public static function add_edit_button( \WP_Admin_Bar $wp_admin_bar ) {
-		// Check if we're on an index page
-		$index_page = get_term_index_page() ?: get_index_page();
-		if ( ! $index_page ) {
+		// Abort if not an archive for the supported post types
+		if ( is_post_type_archive() ) {
+			$index_page = Registry::get_index_page( get_query_var( 'post_type' ) );
+		} else
+		if ( is_category() || is_tag() || is_tax() ) {
+			$index_page = Registry::get_term_page( get_queried_object() );
+		} else
+		if ( is_home() ) {
+			$index_page = Registry::get_index_page( 'post' );
+		} else {
 			return;
 		}
 

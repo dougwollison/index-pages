@@ -51,7 +51,7 @@ abstract class Handler {
 	 * @see Handler::add_filter()
 	 */
 	final public static function add_action() {
-		call_user_func_array( 'self::add_filter', func_get_args() );
+		call_user_func_array( array( get_called_class(), 'add_filter' ), func_get_args() );
 	}
 
 	/**
@@ -81,7 +81,7 @@ abstract class Handler {
 	 * @see Handler::remove_filter()
 	 */
 	final public static function remove_action() {
-		return call_user_func_array( 'self::remove_filter', func_get_args() );
+		return call_user_func_array( array( get_called_class(), 'remove_filter' ), func_get_args() );
 	}
 
 	/**

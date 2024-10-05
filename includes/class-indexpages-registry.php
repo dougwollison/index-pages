@@ -338,10 +338,14 @@ final class Registry {
 		}
 
 		// Find all uses of this page as an index page
-		$matched_pages = array_filter( self::$index_pages, fn( $index_page_id ) => $index_page_id == $page_id);
+		$matched_pages = array_filter( self::$index_pages, function( $index_page_id ) use ( $page_id ) {
+			return $index_page_id == $page_id;
+		} );
 
 		// Filter out any that are for not-currently supported post types
-		$post_types = array_filter( array_keys( $matched_pages ), fn( $post_type ) => self::is_post_type_supported( $post_type ) );
+		$post_types = array_filter( array_keys( $matched_pages ), function( $post_type ) {
+			return Registry::is_post_type_supported( $post_type );
+		} );
 
 		// Return first match
 		return reset( $post_types ) ?: false;

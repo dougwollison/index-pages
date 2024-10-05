@@ -51,7 +51,8 @@ final class Backend extends Handler {
 		self::add_filter( 'display_post_states', 'add_index_state', 10, 2 );
 		self::add_action( 'admin_head', 'handle_editor_notice', 10, 1 );
 		foreach ( $taxonomies as $taxonomy ) {
-			self::add_action( "{$taxonomy}_edit_form_fields", 'add_index_selector', 10, 1 );
+			self::add_action( "{$taxonomy}_add_form_fields", 'add_index_selector', 10, 1 );
+			self::add_action( "{$taxonomy}_edit_form_fields", 'edit_index_selector', 10, 1 );
 		}
 	}
 
@@ -359,6 +360,34 @@ final class Backend extends Handler {
 	 * @param object The term object.
 	 */
 	public static function add_index_selector( $term ) {
+		$args = array(
+			'selected'          => Registry::get_term_page( $term ),
+			'name'              => 'term_index_page',
+			'id'                => 'term_index_page',
+			'show_option_none'  => __( '&mdash; Select &mdash;' ),
+			'option_none_value' => '0',
+			// Include this context flag for use by 3rd party plugins
+			'plugin-context'    => 'index-pages',
+		);
+
+		 /** This filter is documented in IndexPages\Backend::do_page_selector_field() */
+		$args = apply_filters( 'indexpages_dropdown_pages_args', $args, 'term', $term );
+		?>
+		<div class="form-field">
+			<label for="term_index_page"><?php _e( 'Index Page', 'index-pages' ); ?></label>
+			<?php wp_dropdown_pages( $args ); ?>
+		</div>
+		<?php
+	}
+
+	/**
+	 * Print a page dropdown to select the index page for this term.
+	 *
+	 * @since 1.4.0
+	 *
+	 * @param object The term object.
+	 */
+	public static function edit_index_selector( $term ) {
 		$args = array(
 			'selected'          => Registry::get_term_page( $term ),
 			'name'              => 'term_index_page',

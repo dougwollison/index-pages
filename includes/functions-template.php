@@ -45,7 +45,7 @@ function get_index_page( $post_type = null, $return = 'id' ) {
 			if ( is_array( $post_type ) ) {
 				$post_type = reset( $post_type );
 			}
-		} elseif ( is_tax() || is_tag() || is_category() ) {
+		} elseif ( is_a( $object, 'WP_Term' ) ) {
 			// If it's a taxonomy page, assume first object type for the taxonomy
 			$tax = $object->taxonomy;
 			$tax = get_taxonomy( $tax );
