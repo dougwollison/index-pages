@@ -42,6 +42,7 @@ final class Frontend extends Handler {
 	/**
 	 * Register hooks.
 	 *
+	 * @since 1.4.0 Added parse_query hook.
 	 * @since 1.3.0 Added wp_nav_menu_objects hook.
 	 * @since 1.0.0
 	 *
@@ -55,6 +56,7 @@ final class Frontend extends Handler {
 
 		// Request handling
 		self::add_action( 'parse_request', 'handle_request', 10, 1 );
+		self::add_action( 'parse_query', 'patch_query', 10, 1 );
 
 		// Title rewriting
 		self::add_filter( 'post_type_archive_title', 'rewrite_archive_title', 10, 2 );
@@ -75,7 +77,8 @@ final class Frontend extends Handler {
 	 *
 	 * Also checks for date and pagination parameters.
 	 *
-	 * @since 1.4.0 Fixed posts page handling, added support for term pages, pattern/vars rewriting.
+	 * @since 1.4.0 Fixed posts page handling, added support for multiple post types
+	 *              as well as term pages, index_page query var, rewrite pattern/vars.
 	 * @since 1.2.0 Added check to make sure post type currently exists.
 	 * @since 1.0.0
 	 *
@@ -166,46 +169,61 @@ final class Frontend extends Handler {
 			}
 
 			// Ge the post type or term this page is assigned to
-			$post_type = Registry::is_index_page( $page->ID );
-			$term = Registry::is_term_page( $page->ID );
+			$post_types = Registry::is_index_page( $page->ID, 'find_all' );
+			$terms = Registry::is_term_page( $page->ID, 'find_all' );
 
 			// Posts page, abort and leave to default logic
-			if ( $post_type === 'post' ) {
+			if ( count( $post_types ) === 1 && $post_types[0] === 'post' ) {
 				return;
 			}
 
 			// Clear the page related query vars if post type or term is found
-			if ( $post_type || $term ) {
+			if ( $post_types || $terms ) {
 				$true_vars['pagename'] = '';
 				$true_vars['page'] = '';
 				$true_vars['name'] = '';
+				$true_vars['index_page'] = $page->ID;
 			}
 
 			// Get the post type, and validate that it exists
-			if ( $post_type ) {
-				// Modify the request into a post type archive instead
-				$true_vars['post_type'] = $post_type;
+			if ( $post_types ) {
+				if ( empty( $qv['post_type'] ) ) {
+					// Modify the request into a post type archive instead
+					$true_vars['post_type'] = $post_types;
+				}
 			} else
 			// Alternatively, get the term, and validate that it exists
-			if ( $term ) {
-				// Modify the request into a post type archive instead
-				switch ( $term->taxonomy ) {
-					case 'category':
-						$true_vars['cat'] = $term->term_id;
-						break;
+			if ( $terms ) {
+				$terms_by_taxonomy = array();
+				foreach ( $terms as $term_id ) {
+					$term = get_term( $term_id );
+					$terms_by_taxonomy[ $term->taxonomy ] = $term->term_id;
+				}
 
-					case 'post_tag':
-						$true_vars['tag_id'] = $term->term_id;
-						break;
+				foreach ( $terms_by_taxonomy as $taxonomy => $term_ids ) {
+					// Modify the request into a post type archive instead
+					switch ( $taxonomy ) {
+						case 'category':
+							if ( empty( $qv['cat'] ) && empty( $qv['category_name'] ) ) {
+								$true_vars['cat'] = $term->term_id;
+							}
+							break;
 
-					default:
-						$true_vars['tax_query'] = array(
-							array(
-								'taxonomy' => $term->taxonomy,
-								'field' => 'term_id',
-								'terms' => $term->term_id,
-							),
-						);
+						case 'post_tag':
+							if ( empty( $qv['tag_id'] ) && empty( $qv['tag'] ) ) {
+								$true_vars['tag_id'] = $term->term_id;
+							}
+							break;
+
+						default:
+							$true_vars['tax_query'] = array(
+								array(
+									'taxonomy' => $taxonomy,
+									'field' => 'term_id',
+									'terms' => $term_ids,
+								),
+							);
+					}
 				}
 			}
 
@@ -223,6 +241,26 @@ final class Frontend extends Handler {
 
 			// Merge the query vars
 			$wp->query_vars = array_merge( $qv, $true_vars );
+		}
+	}
+
+	/**
+	 * Fix the is_archive/is_home flags on the query.
+	 *
+	 * @since 1.4.0
+	 *
+	 * @param WP_Query $query The WP_Query instance (passed by reference).
+	 */
+	public static function patch_query( $query ) {
+		if ( ! $query->get( 'index_page' ) ) {
+			return;
+		}
+
+		$post_types = (array) $query->get( 'post_type', array() );
+		if ( $post_types ) {
+			$query->is_archive = true;
+			$query->is_post_type_archive = true;
+			$query->is_home = in_array( 'post', $post_types );
 		}
 	}
 

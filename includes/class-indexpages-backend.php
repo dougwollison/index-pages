@@ -268,6 +268,7 @@ final class Backend extends Handler {
 	/**
 	 * Filter the post states list, adding a "*s Page" state flag to if applicable.
 	 *
+	 * @since 1.4.0 Add handling for an index page representing multiple post types.
 	 * @since 1.3.0 Add check to prevent duplicate printing of "Posts Page".
 	 * @since 1.2.0 Added check to make sure post type currently exists.
 	 * @since 1.1.0 Store the post state in an explicit key.
@@ -283,10 +284,14 @@ final class Backend extends Handler {
 		if ( $post->post_type == 'page' ) {
 			// Check if it's an assigned index page (other than for posts),
 			// get the associated post type (and ensure it exists)
-			if ( ( $post_type = Registry::is_index_page( $post->ID ) ) && $post_type !== 'post' && post_type_exists( $post_type ) ) {
+			$post_types = Registry::is_index_page( $post->ID, 'find_all' );
+			foreach ( $post_types as $post_type ) {
+				if (  $post_type === 'post' || ! post_type_exists( $post_type ) ) {
+					continue;
+				}
+
 				// Get the label to use
 				$label = self::get_index_page_label( $post_type );
-
 				$post_states[ "page_for_{$post_type}_posts" ] = $label;
 			}
 		}

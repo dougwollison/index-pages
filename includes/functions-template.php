@@ -182,6 +182,7 @@ function the_term_index_page() {
  * If you don't pass a post type, it'll return the slug of the post
  * type it's the index page for. Otherwise, it'll return true/false.
  *
+ * @since 1.4.0 Add option to find ALL post types page is registered for.
  * @since 1.0.0
  *
  * @param int|object $post_id         Optional The ID of the post to check.
@@ -189,9 +190,7 @@ function the_term_index_page() {
  *
  * @return string|bool The result of the test.
  */
-function is_index_page( $post_id = null, $match_post_type = null ) {
-	global $wpdb;
-
+function is_index_page( $post_id = null, $match_post_type = null, $find_all = false ) {
 	// Handle no post or post object, also get the post type
 	if ( is_null( $post_id ) ) {
 		global $post;
@@ -210,14 +209,14 @@ function is_index_page( $post_id = null, $match_post_type = null ) {
 	}
 
 	// Pass the ID to Registry::is_index_page() to get the post type
-	$for_post_type = Registry::is_index_page( $post_id );
+	$for_post_types = Registry::is_index_page( $post_id, 'find_all' );
 
 	if ( is_null( $match_post_type ) ) {
 		// No match requested, return the post type
-		return $for_post_type;
+		return $find_all ? $for_post_types : ( $for_post_types[0] ?? null );
 	} else {
 		// Match test requested, return result
-		return $match_post_type == $for_post_type;
+		return in_array( $match_post_type, $for_post_types );
 	}
 }
 

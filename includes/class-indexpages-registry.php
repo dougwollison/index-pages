@@ -226,14 +226,19 @@ final class Registry {
 	/**
 	 * Get the assigned index page for a post type.
 	 *
+	 * @since 1.4.0 Handle $post_type being an array.
 	 * @since 1.3.0 Updated to use is_post_type_supported().
 	 * @since 1.0.0
 	 *
-	 * @param string $post_type The post type to look for.
+	 * @param string|string[] $post_type The post type to look for.
 	 *
 	 * @return int|bool The index page ID, or false if not found.
 	 */
 	public static function get_index_page( $post_type ) {
+		if ( is_array( $post_type ) ) {
+			$post_type = reset( $post_type );
+		}
+
 		// Bail if not a supported post type
 		if ( ! self::is_post_type_supported( $post_type ) ) {
 			return false;
@@ -314,41 +319,48 @@ final class Registry {
 	 *
 	 * Can also be used to check if a page is a post-type index page.
 	 *
-	 * @since 1.3.1 Handle multiple post type matches, return first supported one.
+	 * @since 1.4.0 Add option to find ALL post types page is registered for.
 	 * @since 1.3.0 Add check for $page_id being 0 and if matched post type is supported.
 	 * @since 1.0.0
 	 *
-	 * @param int $page_id The ID of the page to check.
+	 * @param int  $page_id  The ID of the page to check.
+	 * @param bool $find_all Optional. Wether or not to return array of ALL matches for page.
 	 *
-	 * @return string|bool The post type it is for, or false if not found.
+	 * @return string|string[]|bool The post type it is for, or false if not found.
 	 */
-	public static function is_index_page( $page_id ) {
+	public static function is_index_page( $page_id, $find_all = false ) {
 		/**
 		 * Filter the ID of the index page to check.
 		 *
 		 * @since 1.0.0
 		 *
-		 * @param int $post_id The ID of the page determined.
+		 * @param int  $post_id  The ID of the page determined.
+		 * @param bool $find_all Wether or not all matches are desired.
 		 */
-		$page_id = apply_filters( 'indexpages_is_index_page', $page_id );
+		$page_id = apply_filters( 'indexpages_is_index_page', $page_id, $find_all );
 
 		// If $page_id is somehow 0, return false
 		if ( ! $page_id ) {
 			return false;
 		}
 
-		// Find all uses of this page as an index page
-		$matched_pages = array_filter( self::$index_pages, function( $index_page_id ) use ( $page_id ) {
-			return $index_page_id == $page_id;
-		} );
+		// Find all post types using that page ID
+		$post_types = array();
+		foreach ( self::$index_pages as $post_type => $p ) {
+			if ( $p === intval( $page_id ) && self::is_post_type_supported( $post_type ) ) {
+				$post_types[] = $post_type;
+			}
+		}
 
-		// Filter out any that are for not-currently supported post types
-		$post_types = array_filter( array_keys( $matched_pages ), function( $post_type ) {
-			return Registry::is_post_type_supported( $post_type );
-		} );
+		if ( $find_all ) {
+			return $post_types;
+		}
 
-		// Return first match
-		return reset( $post_types ) ?: false;
+		if ( ! $post_types ) {
+			return false;
+		}
+
+		return $post_types[0];
 	}
 
 	/**
@@ -356,14 +368,14 @@ final class Registry {
 	 *
 	 * Can also be used to check if a page is a term index page.
 	 *
-	 * @since 1.4.1 Fix check for existing term.
-	 * @since 1.4.0
+	 * @since 1.4.0 Add option to find ALL terms page is registered for, ensure terms exist.
 	 *
-	 * @param int $page_id The ID of the page to check.
+	 * @param int  $page_id  The ID of the page to check.
+	 * @param bool $find_all Optional. Wether or not to return array of ALL matches for page.
 	 *
 	 * @return object|bool The term it is for, or false if not found.
 	 */
-	public static function is_term_page( $page_id ) {
+	public static function is_term_page( $page_id, $find_all = false  ) {
 		/**
 		 * Filter the ID of the index page to check.
 		 *
@@ -378,20 +390,24 @@ final class Registry {
 			return false;
 		}
 
-		// Find a post type using that page ID
-		$term_id = array_search( intval( $page_id ), self::$term_pages, true );
+		// Find all post types using that page ID
+		$terms = array();
+		foreach ( self::$term_pages as $term_id => $p ) {
+			$term = get_term( $term_id );
+			if ( $term && $p === intval( $page_id ) && self::is_taxonomy_supported( $term->taxonomy ) ) {
+				$terms[] = $term_id;
+			}
+		}
 
-		// If not found or term no longer exists, bail
-		if ( ! $term_id || ! ( $term = get_term( $term_id ) ) ) {
+		if ( $find_all ) {
+			return $terms;
+		}
+
+		if ( ! $terms ) {
 			return false;
 		}
 
-		// If it doesn't belong to a currently supported taxonomy, bail
-		if ( ! self::is_taxonomy_supported( $term->taxonomy ) ) {
-			return false;
-		}
-
-		return $term;
+		return $terms[0];
 	}
 
 	// =========================
