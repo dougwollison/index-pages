@@ -258,9 +258,8 @@ final class Frontend extends Handler {
 
 		$post_types = (array) $query->get( 'post_type', array() );
 		if ( $post_types ) {
-			$query->is_archive = true;
-			$query->is_post_type_archive = true;
 			$query->is_home = in_array( 'post', $post_types );
+			$query->is_archive = $query->is_post_type_archive = ! $query->is_home;
 		}
 	}
 
