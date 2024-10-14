@@ -1,8 +1,9 @@
 === Index Pages ===
 Contributors: dougwollison
 Tags: index page, custom post type, custom index, page for posts
-Requires at least: 4.0.0
-Tested up to: 4.7.2
+Requires at least: 6.2.0
+Tested up to: 6.6.2
+Requires PHP: 7.0.0
 Stable tag: 1.3.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
