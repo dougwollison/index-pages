@@ -74,7 +74,7 @@ final class Backend extends Handler {
 	protected static function get_index_page_label( $post_type ) {
 		$post_type_obj = get_post_type_object( $post_type );
 
-		// Default label
+		// translators: %s = post type label
 		$label = sprintf( __( '%s Page', 'index-pages' ), $post_type_obj->label );
 
 		// Use defined label if present in post type's label list
@@ -191,7 +191,7 @@ final class Backend extends Handler {
 	 * @since 1.0.0
 	 */
 	public static function do_settings_section() {
-		echo '<p>' . __( 'Assign existing pages as the index page for posts of the following post types.', 'index-pages' ) . '</p>';
+		echo '<p>' . esc_html__( 'Assign existing pages as the index page for posts of the following post types.', 'index-pages' ) . '</p>';
 	}
 
 	/**
@@ -207,7 +207,7 @@ final class Backend extends Handler {
 			'selected'          => Registry::get_index_page( $config['post_type'] ),
 			'name'              => $config['label_for'],
 			'id'                => $config['label_for'],
-			'show_option_none'  => __( '&mdash; Select &mdash;' ),
+			'show_option_none'  => esc_html__( '&mdash; Select &mdash;', 'index-pages' ),
 			'option_none_value' => '0',
 			// Include this context flag for use by 3rd party plugins
 			'plugin-context'    => 'index-pages',
@@ -240,8 +240,8 @@ final class Backend extends Handler {
 			printf(
 				'<label title="%2$s"><input name="%1$s[]" type="checkbox" value="%2$s" %4$s /> %3$s</label><br /> ',
 				'index_pages_taxonomies',
-				$taxonomy->name,
-				$taxonomy->label,
+				esc_attr( $taxonomy->name ),
+				esc_html( $taxonomy->label ),
 				in_array( $taxonomy->name, $selected ) ? 'checked' : ''
 			);
 		}
@@ -346,12 +346,13 @@ final class Backend extends Handler {
 
 		// Default notice type/message
 		$notice_type = 'info';
+		// translators: %s = link
 		$notice_text = sprintf( __( 'You are currently editing the page that shows your latest %s.', 'index-pages' ), $link );
 
 		// If the post type doesn't explicitly support index-pages, mention content may not be displayed.
 		if ( ! post_type_supports( $post_type, 'index-page' ) ) {
 			$notice_type = 'warning';
-			$notice_text .= ' <em>' . __( 'Your current theme may not display the content you write here.', 'index-pages' ) . '</em>';
+			$notice_text .= ' <em>' . esc_html__( 'Your current theme may not display the content you write here.', 'index-pages' ) . '</em>';
 		}
 
 		printf( '<div class="notice notice-%s inline"><p>%s</p></div>', $notice_type, $notice_text );
@@ -369,7 +370,7 @@ final class Backend extends Handler {
 			'selected'          => Registry::get_term_page( $term ),
 			'name'              => 'term_index_page',
 			'id'                => 'term_index_page',
-			'show_option_none'  => __( '&mdash; Select &mdash;' ),
+			'show_option_none'  => esc_html__( '&mdash; Select &mdash;', 'index-pages' ),
 			'option_none_value' => '0',
 			// Include this context flag for use by 3rd party plugins
 			'plugin-context'    => 'index-pages',
@@ -379,7 +380,7 @@ final class Backend extends Handler {
 		$args = apply_filters( 'indexpages_dropdown_pages_args', $args, 'term', $term );
 		?>
 		<div class="form-field">
-			<label for="term_index_page"><?php _e( 'Index Page', 'index-pages' ); ?></label>
+			<label for="term_index_page"><?php esc_html_e( 'Index Page', 'index-pages' ); ?></label>
 			<?php wp_dropdown_pages( $args ); ?>
 		</div>
 		<?php
@@ -397,7 +398,7 @@ final class Backend extends Handler {
 			'selected'          => Registry::get_term_page( $term ),
 			'name'              => 'term_index_page',
 			'id'                => 'term_index_page',
-			'show_option_none'  => __( '&mdash; Select &mdash;' ),
+			'show_option_none'  => esc_html__( '&mdash; Select &mdash;', 'index-pages' ),
 			'option_none_value' => '0',
 			// Include this context flag for use by 3rd party plugins
 			'plugin-context'    => 'index-pages',
@@ -408,7 +409,7 @@ final class Backend extends Handler {
 		?>
 		<tr class="form-field">
 			<th scope="row">
-				<label for="term_index_page"><?php _e( 'Index Page', 'index-pages' ); ?></label>
+				<label for="term_index_page"><?php esc_html_e( 'Index Page', 'index-pages' ); ?></label>
 			</th>
 			<td>
 				<?php wp_dropdown_pages( $args ); ?>
