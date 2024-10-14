@@ -258,6 +258,19 @@ final class Backend extends Handler {
 	 * @param int $term_id The ID of the term being edited.
 	 */
 	public static function save_index_page( $term_id ) {
+		if ( empty( $_POST['action'] ) ) {
+			return;
+		}
+
+		// Verify we're updating the current term
+		if ( $_POST['action'] == 'add-tag' ) {
+			if ( empty( $_POST['_wpnonce_add-tag'] ) || ! wp_verify_nonce( $_POST['_wpnonce_add-tag'], 'add-tag' ) ) {
+				return;
+			}
+		} else if ( empty( $_POST['_wpnonce'] ) || ! wp_verify_nonce( $_POST['_wpnonce'], 'update-tag_' . $term_id ) ) {
+			return;
+		}
+
 		if ( isset( $_POST['term_index_page'] ) ) {
 			update_option( "page_for_term_{$term_id}", $_POST['term_index_page'] );
 		}
