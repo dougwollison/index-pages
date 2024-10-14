@@ -106,6 +106,7 @@ final class Backend extends Handler {
 	/**
 	 * In case of update, check for notice about the update.
 	 *
+	 * @since 1.4.0 Switch to wp_remote_get().
 	 * @since 1.0.0
 	 *
 	 * @param array $plugin The information about the plugin and the update.
@@ -119,7 +120,8 @@ final class Backend extends Handler {
 		$notice = get_transient( $transient );
 		if ( $notice === false ) {
 			// Hasn't been saved, fetch it from the SVN repo
-			$notice = file_get_contents( "http://plugins.svn.wordpress.org/index-pages/assets/notice-{$version}.txt" ) ?: '';
+			$response = wp_remote_get( "http://plugins.svn.wordpress.org/index-pages/assets/notice-{$version}.txt" );
+			$notice = wp_remote_retrieve_body( $response ) ?: '';
 
 			// Save the notice
 			set_transient( $transient, $notice, YEAR_IN_SECONDS );
