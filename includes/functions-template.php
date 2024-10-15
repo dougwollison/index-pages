@@ -15,7 +15,7 @@ use IndexPages\Registry as Registry;
 /**
  * Get the ID or full post object of the index page.
  *
- * @since 1.4.0 Restrucuted to avoid else > return style.
+ * @since 1.4.0 Restructured to avoid else > return style.
  * @since 1.0.0
  *
  * @param string $post_type Optional The post type to get the index page for.
@@ -187,8 +187,6 @@ function the_term_index_page() {
  * @return string|bool The result of the test.
  */
 function is_index_page( $post_id = null, $match_post_type = null ) {
-	global $wpdb;
-
 	// Handle no post or post object, also get the post type
 	if ( is_null( $post_id ) ) {
 		global $post;
@@ -232,8 +230,6 @@ function is_index_page( $post_id = null, $match_post_type = null ) {
  * @return string|bool The result of the test.
  */
 function is_term_index_page( $post_id = null, $match_term = null ) {
-	global $wpdb;
-
 	// Handle no post or post object, also get the post type
 	if ( is_null( $post_id ) ) {
 		global $post;
@@ -265,11 +261,11 @@ function is_term_index_page( $post_id = null, $match_term = null ) {
 }
 
 /**
- * Return the date archive URL fo the post type.
+ * Return the date archive URL for the post type.
  *
  * @since 1.0.0
  *
- * @globla WP_Rewrite $wp_rewrite The rewrite rules system.
+ * @global WP_Rewrite $wp_rewrite The rewrite rules system.
  *
  * @param string $post_type The post type for the link.
  * @param int    $year      The year for the link. Pass '' for current year.
