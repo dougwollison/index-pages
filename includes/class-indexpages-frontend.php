@@ -292,6 +292,7 @@ final class Frontend extends Handler {
 	/**
 	 * Filter the menu items and handle current menu item/page for index pages.
 	 *
+	 * @since 1.4.0 Fix post type check, handle ancestry.
 	 * @since 1.3.0
 	 *
 	 * @param array $menu_items The menu items to filter.
@@ -303,12 +304,22 @@ final class Frontend extends Handler {
 		$index_page = get_term_index_page() ?: get_index_page();
 
 		if ( $index_page ) {
+			$page_ancestors = get_post_ancestors( $index_page );
+
 			foreach ( $menu_items as $menu_item ) {
-				if ( $menu_item->object === 'page' && $menu_item->object_id == $index_page ) {
-					if ( is_singular() ) {
-						$menu_item->classes[] = 'current_page_parent';
-					} else {
+				if ( $menu_item->object === 'page' ) {
+					if ( $index_page == $menu_item->object_id ) {
 						$menu_item->classes[] = 'current-menu-item';
+					} elseif ( $page_ancestors && $page_ancestors[0] == $menu_item->object_id ) {
+						$menu_item->classes[] = 'current-menu-parent';
+						if ( is_page() ) {
+							$menu_item->classes[] = 'current_page_parent';
+						}
+					} elseif ( in_array( $menu_item->object_id, $page_ancestors ) ) {
+						$menu_item->classes[] = 'current-menu-ancestor';
+						if ( is_page() ) {
+							$menu_item->classes[] = 'current_page_ancestor';
+						}
 					}
 				}
 			}
