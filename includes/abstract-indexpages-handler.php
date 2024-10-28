@@ -36,7 +36,7 @@ abstract class Handler {
 	 * @see add_filter() for details.
 	 *
 	 * @param string $tag           The name of the filter to hook the $method to.
-	 * @param string $method        The name of the called classe's method to run when applied.
+	 * @param string $method        The name of the called class's method to run when applied.
 	 * @param int    $priority      Optional. The priority to use for this particular callback.
 	 * @param int    $accepted_args Optional. The number of arguments the callback accepts.
 	 */
