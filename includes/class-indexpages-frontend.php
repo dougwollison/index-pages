@@ -138,7 +138,7 @@ final class Frontend extends Handler {
 		 * @see IndexPages\compile_regex_groups() for format.
 		 *
 		 * @param string $groups The RegEx groups array.
-		 * @param WP     $wp     The current WordPress environtment instance.
+		 * @param WP     $wp     The current WordPress environment instance.
 		 */
 		$groups = apply_filters( 'indexpages_regex_groups', $groups, $wp );
 
@@ -232,7 +232,7 @@ final class Frontend extends Handler {
 			 *
 			 * @param array $pattern The list of true query vars.
 			 * @param array $matches The full matches from the RegEx, named and unnamed groups.
-			 * @param WP    $wp      The current WordPress environtment instance.
+			 * @param WP    $wp      The current WordPress environment instance.
 			 */
 			$true_vars = apply_filters( 'indexpages_true_vars', $true_vars, $matches, $wp );
 

@@ -39,7 +39,7 @@ final class Backend extends Handler {
 		$taxonomies = Registry::get_supported_taxonomies();
 
 		// After-setup stuff
-		self::add_action( 'plugins_loaded', 'load_textdomain' );
+		self::add_action( 'init', 'load_textdomain' );
 
 		// Settings registration/saving
 		self::add_action( 'admin_init', 'register_settings', 10, 0 );

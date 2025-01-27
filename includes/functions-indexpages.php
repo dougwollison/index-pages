@@ -53,7 +53,7 @@ function is_backend() {
  *     @type string $pattern   The pattern for the group.
  *     @type array  $subgroups Optional. An array of subgroups, same structure as $groups.
  *     @type string $wrapper   Optional. A pattern to match containing the group (e.g. '/%s').
- *     @type bool   $optional  Optional. Wether or not the overall pattern is optional.
+ *     @type bool   $optional  Optional. Whether or not the overall pattern is optional.
  * }
  *
  * @return string The compiled pattern.

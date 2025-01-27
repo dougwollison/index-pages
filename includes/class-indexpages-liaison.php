@@ -66,25 +66,35 @@ final class Liaison extends Handler {
 	 * Return the title of the index page if applicable.
 	 *
 	 * @since 1.4.1 Attempt to use custom SEO title for page if set.
+	 *              Also add support for term page not just post type page.
 	 * @since 1.3.0
 	 */
 	public static function wpseo_do_indexpage_replacement( $key, $args ) {
-		// Get the queried post type
-		$post_types = (array) get_query_var( 'post_type', 'post' );
+		$index_page = null;
 
-		// Get the index for this post type, return it's title if found
-		if ( $index_page = Registry::get_index_page( $post_types[0] ) ) {
-			// Try the custom SEO title if set, strip out placeholders
-			$seo_title = get_post_meta( $index_page, '_yoast_wpseo_title', true );
-			if ( $seo_title ) {
-				$seo_title = preg_replace( '/%%\w+%%/', '', $seo_title );
-				$seo_title = preg_replace( '/\s+/', ' ', $seo_title );
-				$seo_title = trim( $seo_title );
-			}
-
-			return $seo_title ?: get_the_title( $index_page );
+		// Term requested, get it's page if set
+		if ( ! empty( $args->term_id ) ) {
+			$index_page = Registry::get_term_page( $args->term_id, $args->taxonomy );
+		} else
+		// Post type requested, get that index page
+		if ( ! empty( $args->post_type ) ) {
+			$index_page = Registry::get_index_page( $args->post_type );
 		}
 
-		return false;
+		// No page found, abort
+		if ( ! $index_page ) {
+			return false;
+		}
+
+		// Try the custom SEO title if set, strip out placeholders
+		$seo_title = get_post_meta( $index_page, '_yoast_wpseo_title', true );
+		if ( $seo_title ) {
+			$seo_title = preg_replace( '/%%\w+%%/', '', $seo_title );
+			$seo_title = preg_replace( '/\s+/', ' ', $seo_title );
+			$seo_title = trim( $seo_title );
+			return $seo_title;
+		}
+
+		return get_the_title( $index_page );
 	}
 }
