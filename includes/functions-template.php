@@ -94,7 +94,7 @@ function get_term_index_page( $term = null, $return = 'id', $taxonomy = null ) {
 		$object = get_queried_object();
 
 		// If it's a term page, and the queried object is the term, use that
-		if ( is_category() || is_tag() || is_tax() && is_a( $object, 'WP_Term' ) ) {
+		if ( ( is_category() || is_tag() || is_tax() ) && is_a( $object, 'WP_Term' ) ) {
 			return get_term_index_page( $object, $return );
 		}
 
