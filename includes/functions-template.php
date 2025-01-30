@@ -47,7 +47,7 @@ function get_index_page( $post_type = null, $return = 'id' ) {
 			$tax = $object->taxonomy;
 			$tax = get_taxonomy( $tax );
 			$post_type = $tax->object_type[0];
-		} elseif ( is_singular() ) {
+		} elseif ( is_singular() && is_a( $object, 'WP_Post' ) ) {
 			// If single post, use the queried object's post type
 			$post_type = $object->post_type;
 		} else {
