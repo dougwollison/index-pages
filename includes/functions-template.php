@@ -50,7 +50,7 @@ function get_index_page( $post_type = null, $return = 'id' ) {
 			$tax = $object->taxonomy;
 			$tax = get_taxonomy( $tax );
 			$post_type = $tax->object_type[0];
-		} elseif ( is_singular() ) {
+		} elseif ( is_singular() && is_a( $object, 'WP_Post' ) ) {
 			// If single post, use the queried object's post type
 			$post_type = $object->post_type;
 		} else {
@@ -97,7 +97,7 @@ function get_term_index_page( $term = null, $return = 'id', $taxonomy = null ) {
 		$object = get_queried_object();
 
 		// If it's a term page, and the queried object is the term, use that
-		if ( is_category() || is_tag() || is_tax() && is_a( $object, 'WP_Term' ) ) {
+		if ( ( is_category() || is_tag() || is_tax() ) && is_a( $object, 'WP_Term' ) ) {
 			return get_term_index_page( $object, $return );
 		}
 
