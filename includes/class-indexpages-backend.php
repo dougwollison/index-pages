@@ -327,7 +327,7 @@ final class Backend extends Handler {
 	 *
 	 * @param WP_Post $post Optional. The post in question.
 	 */
-	public static function maybe_do_index_notice( \WP_Post|null $post = null ) {
+	public static function maybe_do_index_notice( $post = null ) {
 		$post = get_post( $post );
 
 		// Abort if not a page or not an index page
