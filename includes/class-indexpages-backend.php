@@ -325,7 +325,7 @@ final class Backend extends Handler {
 	 * @since 1.1.0 Added missing static keyword
 	 * @since 1.0.0
 	 *
-	 * @param WP_Post $post Optional. The post in question.
+	 * @param WP_Post|int $post Optional. The post in question.
 	 */
 	public static function maybe_do_index_notice( $post = null ) {
 		$post = get_post( $post );
